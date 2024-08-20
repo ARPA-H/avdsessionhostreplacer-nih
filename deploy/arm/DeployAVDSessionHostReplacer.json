@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "8616059663260500894"
+      "version": "0.27.1.19265",
+      "templateHash": "4055496349297329081"
     }
   },
   "parameters": {
@@ -541,8 +541,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "530444631168753838"
+              "version": "0.27.1.19265",
+              "templateHash": "1916032844733023152"
             }
           },
           "parameters": {
@@ -598,7 +598,7 @@
             "ReplacementPlanSettings": {
               "type": "array",
               "metadata": {
-                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\n[\n  {\n    name: '_HostPoolResourceGroupName'\n    value: 'string'\n  }\n  {\n    name: '_HostPoolName'\n    value: 'string'\n  }\n  {\n    name: '_RemoveEntraDevice'\n    value: 'bool'\n  }\n  {\n    name: '_SessionHostTemplate'\n    value: 'string'\n  }\n  {\n    name: '_SessionHostParameters'\n    value: 'hashtable'\n  }\n  {\n    name: '_SubscriptionId'\n    value: 'string'\n  }\n  {\n    name: '_TargetSessionHostCount'\n    value: 'int'\n  }\n  {\n    name: '_SessionHostNamePrefix'\n    value: 'string'\n  }\n]"
+                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\r\n[\r\n  {\r\n    name: '_HostPoolResourceGroupName'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_HostPoolName'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_RemoveEntraDevice'\r\n    value: 'bool'\r\n  }\r\n  {\r\n    name: '_SessionHostTemplate'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_SessionHostParameters'\r\n    value: 'hashtable'\r\n  }\r\n  {\r\n    name: '_SubscriptionId'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_TargetSessionHostCount'\r\n    value: 'int'\r\n  }\r\n  {\r\n    name: '_SessionHostNamePrefix'\r\n    value: 'string'\r\n  }\r\n]"
               }
             },
             "FunctionAppIdentity": {
@@ -746,8 +746,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "17584014780822218958"
+              "version": "0.27.1.19265",
+              "templateHash": "2524519128832046544"
             }
           },
           "parameters": {
@@ -822,8 +822,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "8573904393442968176"
+              "version": "0.27.1.19265",
+              "templateHash": "518787779363807926"
             }
           },
           "parameters": {
@@ -1300,8 +1300,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "852792330190262115"
+              "version": "0.27.1.19265",
+              "templateHash": "15840473922521238774"
             }
           },
           "parameters": {
@@ -1361,8 +1361,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "852792330190262115"
+              "version": "0.27.1.19265",
+              "templateHash": "15840473922521238774"
             }
           },
           "parameters": {
