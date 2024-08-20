@@ -1,15 +1,17 @@
 on:
-  push:
-    paths:
-      - 'FunctionApp/**'
-      - 'deploy/**'
-      - 'StandardSessionHostTemplate/**'
+  # push:
+  #   paths:
+  #     - 'FunctionApp/**'
+  #     - 'deploy/**'
+  #     - 'StandardSessionHostTemplate/**'
+  # workflow_dispatch:
+  #   inputs:
+  #     messages:
+  #      description: 'Why are you running manually?'
+  #      required: false
+  #      default: 'Manual Run'
   workflow_dispatch:
-    inputs:
-      messages:
-       description: 'Why are you running manually?'
-       required: false
-       default: 'Manual Run'
+
 jobs:
   Build-Nightly-Zip:
     runs-on: ubuntu-latest
