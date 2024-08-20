@@ -1,6 +1,6 @@
 param (
     [string]$DomJoinUserName,
-    [securestring]$DomJoinUserPassword,
+    [string]$DomJoinUserPassword,
     [string]$OUName,
     [string]$SubnetId,
     [string]$LogAnalyticsWorkspaceId,
@@ -93,7 +93,4 @@ $paramNewAzResourceGroupDeployment = @{
 #New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
 
 Write-Output $paramNewAzResourceGroupDeployment
-Write-Output $TemplateParameters
-
-#$output = 'DomJoinUserName={0}, DomJoinUserPassword={1}, OUName={2}, SubnetId={3}, LogAnalyticsWorkspaceId={4}, IdentityDomainName{5}' -f $DomJoinUserName, $DomJoinUserPassword, $OUName, $SubnetId, $LogAnalyticsWorkspaceId, $IdentityDomainName
-#Write-Output $output
+#Write-Output $TemplateParameters
