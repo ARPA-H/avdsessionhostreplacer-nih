@@ -1,3 +1,5 @@
+name: Input Test
+
 on:
     workflow_dispatch:
       inputs:
@@ -10,24 +12,24 @@ on:
             - info
             - warning
             - debug
-        print_tags:
-          description: 'True to print to STDOUT'
-          required: true
-          type: boolean
-        tags:
-          description: 'Test scenario tags'
-          required: true
-          type: string
-        environment:
-          description: 'Environment to run tests against'
-          type: environment
-          required: true
+        # print_tags:
+        #   description: 'True to print to STDOUT'
+        #   required: true
+        #   type: boolean
+        # tags:
+        #   description: 'Test scenario tags'
+        #   required: true
+        #   type: string
+        # environment:
+        #   description: 'Environment to run tests against'
+        #   type: environment
+        #   required: true
 
 jobs:
     print-tag:
        runs-on: ubuntu-latest
-       if:  ${{ inputs.print_tags }} 
+       #if:  ${{ inputs.print_tags }} 
        steps:
         - name: Print the input tag to STDOUT
-          run: echo  The tags are ${{ inputs.tags }} echo The environment is ${{ inputs.logLevel }}
+          run: echo The logLevel is ${{ inputs.logLevel }}
           
