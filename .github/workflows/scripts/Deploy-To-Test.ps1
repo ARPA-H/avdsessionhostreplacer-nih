@@ -23,8 +23,8 @@ $TemplateParameters = @{
     HostPoolResourceGroupName                    = $ResourceGroupName
     #SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
     SessionHostNamePrefix                        = 'arpah' # Will be appended by '-XX'
-    TargetSessionHostCount                       = 10 # How many session hosts to maintain in the Host Pool
-    TargetSessionHostBuffer                      = 5 # The maximum number of session hosts to add during a replacement process
+    TargetSessionHostCount                       = 5 # How many session hosts to maintain in the Host Pool
+    TargetSessionHostBuffer                      = 2 # The maximum number of session hosts to add during a replacement process
     IncludePreExistingSessionHosts               = $false # Include existing session hosts in automation
 
     # Identity
