@@ -1,4 +1,4 @@
-name: Deploy AVD Session Host Replacer to NIH Test
+name: Deprecated - Deploy AVD Session Host Replacer to NIH Test
 
 on:
     workflow_dispatch:
