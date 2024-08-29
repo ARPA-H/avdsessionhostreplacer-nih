@@ -12,7 +12,7 @@ resource deployTemplateSpec 'Microsoft.Resources/templateSpecs@2022-02-01' = {
     name: 'deploymentTemplateSpecVersion'
     location: Location
     properties: {
-      mainTemplate: loadJsonContent('../../../StandardSessionHostTemplate/DeploySessionHosts.bicep')
+      mainTemplate: loadJsonContent('../../../StandardSessionHostTemplate/DeploySessionHosts.json')
     }
   }
 }
