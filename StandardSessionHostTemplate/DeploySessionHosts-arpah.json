@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "11784787085459809456"
+      "templateHash": "4779387875570814399"
     }
   },
   "parameters": {
@@ -136,7 +136,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "10911582647457079552"
+              "templateHash": "2848426892152459213"
             }
           },
           "parameters": {
@@ -228,6 +228,22 @@
                     "disableAlerts": "false"
                   }
                 }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-09-01",
+              "name": "[format('{0}/{1}', parameters('VMName'), 'deployAzureMonitoring')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "publisher": "Microsoft.Azure.Monitor",
+                "type": "AzureMonitorWindowsAgent",
+                "typeHandlerVersion": "1.22",
+                "autoUpgradeMinorVersion": true,
+                "settings": {}
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"

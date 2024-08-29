@@ -464,6 +464,7 @@ module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvid
     DomainJoinPassword: ADJoinUserPassword
   }
 }
+
 module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec-arpah.bicep' = {
   name: 'deployStandardSessionHostTemplate'
   params: {
@@ -471,6 +472,22 @@ module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec-arp
     Name: '${HostPoolName}-Spec'
   }
 }
+
+// module deploySessionHost '../../StandardSessionHostTemplate/DeploySessionHosts-arpah.bicep' = {
+//   name: 
+//   params: {
+//     AcceleratedNetworking: 
+//     AdminUsername: 
+//     DiskType: 
+//     HostPoolName: 
+//     HostPoolToken: 
+//     ImageReference: {}
+//     SubnetID: 
+//     VMNames: 
+//     VMSize: 
+//   }
+// }
+
 //---- Role Assignments ----//
 // These roles are only assigned if the FunctionApp is using a System Managed Identity (MSI). Please manually assign when using a User Assigned Managed Identity.
 module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {

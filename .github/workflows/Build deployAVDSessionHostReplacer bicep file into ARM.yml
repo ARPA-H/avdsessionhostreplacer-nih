@@ -27,7 +27,7 @@ jobs:
       - name: Build Bicep File
         shell: pwsh
         run: |
-          bicep build deploy/bicep/DeployAVDSessionHostReplacer-arpah.bicep --outfile deploy/arm/DeployAVDSessionHostReplacer.json
+          bicep build deploy/bicep/DeployAVDSessionHostReplacer-arpah.bicep --outfile deploy/arm/DeployAVDSessionHostReplacer-arpah.json
 
       - name: publish
         uses: stefanzweifel/git-auto-commit-action@v4

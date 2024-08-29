@@ -91,8 +91,11 @@ $paramNewAzResourceGroupDeployment = @{
     # this one works
     #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.3.1-beta.1/deploy/arm/DeployAVDSessionHostReplacer.json'
 
+    # arpa-h template
+    TemplateUri = 'https://raw.githubusercontent.com/ARPA-H/avdsessionhostreplacer-nih/main/deploy/arm/DeployAVDSessionHostReplacer-arpah.json'
+
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
-    TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer-arpah.bicep'
+    #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer-arpah.bicep'
     TemplateParameterObject = $TemplateParameters
 }
 

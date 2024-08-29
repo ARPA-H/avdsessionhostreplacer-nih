@@ -30,7 +30,7 @@ param DomainJoinObject object = {}
 @secure()
 param DomainJoinPassword string = ''
 
-module deploySessionHosts 'modules/AVDStandardSessionHost.bicep' = [for vm in VMNames: {
+module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm in VMNames: {
   name: 'deploySessionHost-${vm}'
   params: {
     AcceleratedNetworking: AcceleratedNetworking
