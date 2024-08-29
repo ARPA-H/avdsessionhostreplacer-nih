@@ -43,6 +43,26 @@ var varVMNumber = int(
 
 var varAvailabilityZone = AvailabilityZones == [] ? [] : [ '${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}' ]
 
+
+var varBaseScriptUri = 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/main/workload/'
+var varSessionHostConfigurationScriptUri = '${varBaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
+var varSessionHostConfigurationScript = './Set-SessionHostConfiguration.ps1'
+
+@sys.description('Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)')
+param avdIdentityServiceProvider string = 'ADDS'
+
+@sys.description('Required, the storage account name for the FSLogix profile container')
+param varFslogixStorageName string = 'stfslavdxtbiz'
+
+@sys.description('Required, the file share name for the FSLogix profile container')
+param varFslogixFileShareName string = 'fslogix-pc-app1-test-use2-001'
+
+@sys.description('Required, the path to the FSLogix profile container')
+var varFslogixSharePath = '\\\\${varFslogixStorageName}.file.${environment().suffixes.storage}\\${varFslogixFileShareName}' 
+
+@sys.description('Required, the FQDN of the storage account for the FSLogix profile container')
+var varFslogixStorageFqdn = '${varFslogixStorageName}.file.${environment().suffixes.storage}' 
+
 resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   name: '${VMName}-vNIC'
   location: Location
@@ -85,7 +105,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
           storageAccountType: DiskType
         }
       }
-      ImageReference: ImageReference
+      imageReference: ImageReference
     }
     securityProfile: SecurityProfile
     diagnosticsProfile: {
@@ -273,8 +293,28 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   tags: Tags
 }
 
-// // Apply AVD session host configurations
-// module sessionHostConfiguration '.bicep/configureSessionHost.bicep' = [for i in range(1, count): {
+// Apply AVD session host configurations
+module sessionHostConfiguration '.bicep/configureSessionHost.bicep' = {
+  //scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
+  name: 'SH-Config'
+  params: {
+      location: Location
+      name: 'sessionHostConfiguration'
+      //hostPoolToken: keyVault.getSecret('hostPoolRegistrationToken')
+      hostPoolToken: ''
+      baseScriptUri: varSessionHostConfigurationScriptUri
+      scriptName: varSessionHostConfigurationScript
+      fslogix: true
+      identityDomainName: 'nih.gov'
+      vmSize: VMSize
+      fslogixFileShare: varFslogixSharePath
+      fslogixStorageFqdn: varFslogixStorageFqdn
+      identityServiceProvider: avdIdentityServiceProvider
+  }
+  dependsOn: [ VM ]
+}
+
+// module sessionHostConfigurationTest '.bicep/configureSessionHost.bicep' = [for i in range(1, count): {
 //   scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
 //   name: 'SH-Config-${batchId}-${i}-${time}'
 //   params: {
