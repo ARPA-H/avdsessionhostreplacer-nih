@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.29.47.4906",
-      "templateHash": "8042164850330358493"
+      "templateHash": "13900353986183550562"
     }
   },
   "parameters": {
@@ -459,11 +459,11 @@
               },
               {
                 "name": "_ClientId",
-                "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId, '')]"
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
               },
               {
                 "name": "_TenantId",
-                "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId, '')]"
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
               },
               {
                 "name": "_GraphEnvironmentName",
@@ -542,7 +542,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "7969194481035008910"
+              "templateHash": "17223373059197527263"
             }
           },
           "parameters": {
@@ -576,7 +576,7 @@
             },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.1-beta.1/FunctionApp.zip",
+              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.0/FunctionApp.zip",
               "metadata": {
                 "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
               }
@@ -823,7 +823,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.29.47.4906",
-              "templateHash": "4028123662238599012"
+              "templateHash": "3764745614213806225"
             }
           },
           "parameters": {
@@ -843,7 +843,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.29.47.4906",
-                  "templateHash": "4779387875570814399"
+                  "templateHash": "16605071579164448535"
                 }
               },
               "parameters": {
@@ -974,7 +974,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.29.47.4906",
-                          "templateHash": "2848426892152459213"
+                          "templateHash": "2200622810536620973"
                         }
                       },
                       "parameters": {
@@ -1034,12 +1034,38 @@
                         "DomainJoinPassword": {
                           "type": "securestring",
                           "defaultValue": ""
+                        },
+                        "avdIdentityServiceProvider": {
+                          "type": "string",
+                          "defaultValue": "ADDS",
+                          "metadata": {
+                            "description": "Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)"
+                          }
+                        },
+                        "varFslogixStorageName": {
+                          "type": "string",
+                          "defaultValue": "stfslavdxtbiz",
+                          "metadata": {
+                            "description": "Required, the storage account name for the FSLogix profile container"
+                          }
+                        },
+                        "varFslogixFileShareName": {
+                          "type": "string",
+                          "defaultValue": "fslogix-pc-app1-test-use2-001",
+                          "metadata": {
+                            "description": "Required, the file share name for the FSLogix profile container"
+                          }
                         }
                       },
                       "variables": {
                         "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
                         "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
-                        "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
+                        "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]",
+                        "varBaseScriptUri": "https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/main/workload/",
+                        "varSessionHostConfigurationScriptUri": "[[format('{0}scripts/Set-SessionHostConfiguration.ps1', variables('varBaseScriptUri'))]",
+                        "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration.ps1",
+                        "varFslogixSharePath": "[[format('\\\\{0}.file.{1}\\{2}', parameters('varFslogixStorageName'), environment().suffixes.storage, parameters('varFslogixFileShareName'))]",
+                        "varFslogixStorageFqdn": "[[format('{0}.file.{1}', parameters('varFslogixStorageName'), environment().suffixes.storage)]"
                       },
                       "resources": [
                         {
@@ -1222,7 +1248,7 @@
                                   "storageAccountType": "[[parameters('DiskType')]"
                                 }
                               },
-                              "ImageReference": "[[parameters('ImageReference')]"
+                              "imageReference": "[[parameters('ImageReference')]"
                             },
                             "securityProfile": "[[parameters('SecurityProfile')]",
                             "diagnosticsProfile": {
@@ -1245,6 +1271,183 @@
                           "tags": "[[parameters('Tags')]",
                           "dependsOn": [
                             "[[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
+                          ]
+                        },
+                        {
+                          "type": "Microsoft.Resources/deployments",
+                          "apiVersion": "2022-09-01",
+                          "name": "SH-Config",
+                          "properties": {
+                            "expressionEvaluationOptions": {
+                              "scope": "inner"
+                            },
+                            "mode": "Incremental",
+                            "parameters": {
+                              "location": {
+                                "value": "[[parameters('Location')]"
+                              },
+                              "name": {
+                                "value": "sessionHostConfiguration"
+                              },
+                              "hostPoolToken": {
+                                "value": ""
+                              },
+                              "baseScriptUri": {
+                                "value": "[[variables('varSessionHostConfigurationScriptUri')]"
+                              },
+                              "scriptName": {
+                                "value": "[[variables('varSessionHostConfigurationScript')]"
+                              },
+                              "fslogix": {
+                                "value": true
+                              },
+                              "identityDomainName": {
+                                "value": "nih.gov"
+                              },
+                              "vmSize": {
+                                "value": "[[parameters('VMSize')]"
+                              },
+                              "fslogixFileShare": {
+                                "value": "[[variables('varFslogixSharePath')]"
+                              },
+                              "fslogixStorageFqdn": {
+                                "value": "[[variables('varFslogixStorageFqdn')]"
+                              },
+                              "identityServiceProvider": {
+                                "value": "[[parameters('avdIdentityServiceProvider')]"
+                              }
+                            },
+                            "template": {
+                              "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                              "contentVersion": "1.0.0.0",
+                              "metadata": {
+                                "_generator": {
+                                  "name": "bicep",
+                                  "version": "0.29.47.4906",
+                                  "templateHash": "7216705815368457530"
+                                }
+                              },
+                              "parameters": {
+                                "name": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "Extension deployment name."
+                                  }
+                                },
+                                "identityServiceProvider": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "The service providing domain services for Azure Virtual Desktop."
+                                  }
+                                },
+                                "identityDomainName": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "Identity domain name."
+                                  }
+                                },
+                                "location": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "Location where to deploy compute services."
+                                  }
+                                },
+                                "baseScriptUri": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "URI for AVD session host configuration URI path."
+                                  }
+                                },
+                                "scriptName": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "URI for AVD session host configuration script."
+                                  }
+                                },
+                                "fslogix": {
+                                  "type": "bool",
+                                  "metadata": {
+                                    "description": "Deploy FSlogix configuration."
+                                  }
+                                },
+                                "fslogixFileShare": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "File share path for FSlogix storage."
+                                  }
+                                },
+                                "fslogixStorageFqdn": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "FSLogix storage account FDQN."
+                                  }
+                                },
+                                "vmSize": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "Session host VM size."
+                                  }
+                                },
+                                "hostPoolToken": {
+                                  "type": "securestring",
+                                  "metadata": {
+                                    "description": "AVD Host Pool registration token"
+                                  }
+                                }
+                              },
+                              "variables": {
+                                "varScriptArguments": "[[if(parameters('fslogix'), format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('identityDomainName'), variables('varAmdVmSize'), parameters('identityServiceProvider'), parameters('fslogix'), parameters('fslogixFileShare'), parameters('fslogixStorageFqdn'), parameters('hostPoolToken'), variables('varNvidiaVmSize')), format('-AmdVmSize {0} -IdentityServiceProvider {1} -Fslogix {2} -HostPoolRegistrationToken {3} -NvidiaVmSize {4} -verbose', variables('varAmdVmSize'), parameters('identityServiceProvider'), parameters('fslogix'), parameters('hostPoolToken'), variables('varNvidiaVmSize')))]",
+                                "varAmdVmSizes": [
+                                  "Standard_NV4as_v4",
+                                  "Standard_NV8as_v4",
+                                  "Standard_NV16as_v4",
+                                  "Standard_NV32as_v4"
+                                ],
+                                "varAmdVmSize": "[[contains(variables('varAmdVmSizes'), parameters('vmSize'))]",
+                                "varNvidiaVmSizes": [
+                                  "Standard_NV6",
+                                  "Standard_NV12",
+                                  "Standard_NV24",
+                                  "Standard_NV12s_v3",
+                                  "Standard_NV24s_v3",
+                                  "Standard_NV48s_v3",
+                                  "Standard_NC4as_T4_v3",
+                                  "Standard_NC8as_T4_v3",
+                                  "Standard_NC16as_T4_v3",
+                                  "Standard_NC64as_T4_v3",
+                                  "Standard_NV6ads_A10_v5",
+                                  "Standard_NV12ads_A10_v5",
+                                  "Standard_NV18ads_A10_v5",
+                                  "Standard_NV36ads_A10_v5",
+                                  "Standard_NV36adms_A10_v5",
+                                  "Standard_NV72ads_A10_v5"
+                                ],
+                                "varNvidiaVmSize": "[[contains(variables('varNvidiaVmSizes'), parameters('vmSize'))]"
+                              },
+                              "resources": [
+                                {
+                                  "type": "Microsoft.Compute/virtualMachines/extensions",
+                                  "apiVersion": "2023-09-01",
+                                  "name": "[[format('{0}/SessionHostConfig', parameters('name'))]",
+                                  "location": "[[parameters('location')]",
+                                  "properties": {
+                                    "publisher": "Microsoft.Compute",
+                                    "type": "CustomScriptExtension",
+                                    "typeHandlerVersion": "1.10",
+                                    "autoUpgradeMinorVersion": true,
+                                    "settings": {
+                                      "fileUris": "[[array(parameters('baseScriptUri'))]"
+                                    },
+                                    "protectedSettings": {
+                                      "commandToExecute": "[[format('powershell -ExecutionPolicy Unrestricted -File {0} {1}', parameters('scriptName'), variables('varScriptArguments'))]"
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                           ]
                         }
                       ]
