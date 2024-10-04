@@ -324,8 +324,10 @@ tags: Tags
 
 
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
-  name: 'SH-Config/${VMName}'
+  //name: 'SH-Config/${VMName}'
+  name: 'SH-Config'
   location: Location
+  parent: VM
   properties: {
     publisher: 'Microsoft.Compute'
     type: 'CustomScriptExtension'
