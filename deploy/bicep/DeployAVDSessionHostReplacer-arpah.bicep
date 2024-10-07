@@ -155,7 +155,6 @@ param KeyVaultName string
 @description('SessionDesktop or RemoteApp')
 param AppPoolType string
 
-
 /////////////////
 
 //---- Variables ----//

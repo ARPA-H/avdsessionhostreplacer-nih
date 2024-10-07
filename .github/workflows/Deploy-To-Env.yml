@@ -25,7 +25,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
 
-      - name: Run Azure PowerShell Script File to deploy session host replacer to the session desktop host poool in the ${{ github.event.inputs.environment }} environment
+      - name: Run Azure PowerShell Script File to deploy session host replacer to the session desktop host pool in the ${{ github.event.inputs.environment }} environment
         uses: azure/powershell@v2
         with:
             inlineScript: ./.github/workflows/scripts/Deploy-To-Test.ps1 `
