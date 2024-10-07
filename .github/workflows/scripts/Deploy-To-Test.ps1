@@ -15,6 +15,8 @@ param (
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
 
+$TemplateName = "AVDSessionHostReplacer-$AppPoolType"
+
 $TemplateParameters = @{
     EnableMonitoring                             = $true
     UseExistingLAW                               = $true
@@ -88,7 +90,8 @@ $TemplateParameters = @{
 }
 
 $paramNewAzResourceGroupDeployment = @{
-    Name = 'AVDSessionHostReplacer'
+    #Name = 'AVDSessionHostReplacer'
+    Name = $TemplateName
     ResourceGroupName = $ResourceGroupName
     #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.0.1-beta.0/deploy/arm/DeployAVDSessionHostReplacer.json'
     #TemplateUri = 'https://github.com/ARPA-H/avdsessionhostreplacer-nih/blob/main/deploy/arm/DeployAVDSessionHostReplacer.json'
