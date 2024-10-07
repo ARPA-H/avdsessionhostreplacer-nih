@@ -42,7 +42,7 @@ jobs:
              -KeyVaultName 'kv-sc3-avdx-${{ github.event.inputs.environment }}-use2' `
              -AppPoolType 'SessionDesktop' 
             azPSVersion: "latest"
-            errorActionPreference: continue
+            errorActionPreference: stop
 
       # - name: Run Azure PowerShell Script File to deploy session host replacer to the remote app host poool in the ${{ github.event.inputs.environment }} environment
       #   uses: azure/powershell@v2

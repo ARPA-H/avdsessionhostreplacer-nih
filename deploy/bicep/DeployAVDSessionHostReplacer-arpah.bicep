@@ -146,14 +146,14 @@ param SessionHostResourceGroupName string = ''
 param TimeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
 
 @description('Existing key vault name to use for retrieving domain join password.')
-param KeyVaultName string
+param KeyVaultName string = ''
 
 @allowed([
   'SessionDesktop'
   'RemoteApp'
 ])
 @description('SessionDesktop or RemoteApp')
-param AppPoolType string
+param AppPoolType string = 'SessionDesktop'
 
 /////////////////
 
