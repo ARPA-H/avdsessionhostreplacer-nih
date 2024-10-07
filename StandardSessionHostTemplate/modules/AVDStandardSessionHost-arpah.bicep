@@ -299,30 +299,6 @@ resource DomainJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType ==
 tags: Tags
 }
 
-// Apply AVD session host configurations
-// module sessionHostConfiguration '.bicep/configureSessionHost.bicep' = {
-//   //scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
-//   name: 'SH-Config'
-//   params: {
-//       location: Location
-//       name: 'sessionHostConfiguration'
-//       hostPoolToken: HostPoolToken
-//       baseScriptUri: varSessionHostConfigurationScriptUri
-//       scriptName: varSessionHostConfigurationScript
-//       fslogix: true
-//       identityDomainName: 'nih.gov'
-//       vmSize: VMSize
-//       fslogixFileShare: varFslogixSharePath
-//       fslogixStorageFqdn: varFslogixStorageFqdn
-//       identityServiceProvider: avdIdentityServiceProvider
-//   }
-//   dependsOn: [ 
-//     VM 
-//   ]
-// }
-
-
-
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
   //name: 'SH-Config/${VMName}'
   name: VMName
@@ -341,25 +317,3 @@ resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09
     }
   }
 }
-
-// module sessionHostConfigurationTest '.bicep/configureSessionHost.bicep' = [for i in range(1, count): {
-//   scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
-//   name: 'SH-Config-${batchId}-${i}-${time}'
-//   params: {
-//       location: location
-//       name: '${namePrefix}${padLeft((i + countIndex), 4, '0')}'
-//       hostPoolToken: keyVault.getSecret('hostPoolRegistrationToken')
-//       baseScriptUri: sessionHostConfigurationScriptUri
-//       scriptName: sessionHostConfigurationScript
-//       fslogix: createAvdFslogixDeployment
-//       identityDomainName: identityDomainName
-//       vmSize: vmSize
-//       fslogixFileShare: fslogixSharePath
-//       fslogixStorageFqdn: fslogixStorageFqdn
-//       identityServiceProvider: identityServiceProvider
-//   }
-//   dependsOn: [
-//       sessionHosts
-//       monitoring
-//   ]
-// }]
