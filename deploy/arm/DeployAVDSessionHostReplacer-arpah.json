@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "8937179593767883439"
+      "templateHash": "8248255568920168231"
     }
   },
   "parameters": {
@@ -296,6 +296,12 @@
     "TimeStamp": {
       "type": "string",
       "defaultValue": "[utcNow()]"
+    },
+    "KeyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Existing key vault name to use for retrieving domain join password."
+      }
     }
   },
   "variables": {
@@ -374,6 +380,21 @@
     "varImageReference": "[if(equals(parameters('MarketPlaceOrCustomImage'), 'Marketplace'), createObject('publisher', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].publisher, 'offer', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].offer, 'sku', variables('varMarketPlaceImages')[parameters('MarketPlaceImage')].sku, 'version', 'latest'), createObject('Id', parameters('GalleryImageId')))]",
     "varSecurityProfile": "[if(equals(parameters('SecurityType'), 'Standard'), null(), createObject('securityType', parameters('SecurityType'), 'uefiSettings', createObject('secureBootEnabled', parameters('SecureBootEnabled'), 'vTpmEnabled', parameters('TpmEnabled'))))]",
     "varDomainJoinObject": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), createObject('DomainType', 'EntraID', 'IntuneJoin', parameters('IntuneEnrollment')), createObject('DomainType', 'ActiveDirectory', 'DomainName', parameters('ADDomainName'), 'DomainJoinUserName', parameters('ADDomainJoinUserName'), 'ADOUPath', parameters('ADOUPath')))]",
+    "varDomainJoinPasswordReference": "[if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', subscription().subscriptionId), format('{0}', parameters('HostPoolResourceGroupName'))), 'Microsoft.KeyVault/vaults', parameters('KeyVaultName'))), 'secretName', 'domainJoinUserPassword')))]",
+    "varSessionHostTemplateParameters": {
+      "Location": "[parameters('SessionHostsRegion')]",
+      "AvailabilityZones": "[parameters('AvailabilityZones')]",
+      "VMSize": "[parameters('SessionHostSize')]",
+      "AcceleratedNetworking": "[parameters('AcceleratedNetworking')]",
+      "DiskType": "[parameters('SessionHostDiskType')]",
+      "ImageReference": "[variables('varImageReference')]",
+      "SecurityProfile": "[variables('varSecurityProfile')]",
+      "SubnetId": "[parameters('SubnetId')]",
+      "DomainJoinObject": "[variables('varDomainJoinObject')]",
+      "DomainJoinPassword": "[variables('varDomainJoinPasswordReference')]",
+      "AdminUsername": "[parameters('LocalAdminUsername')]",
+      "tags": {}
+    },
     "varAzureEnvironments": [
       "AzureCloud",
       "AzureUSGovernment",
@@ -443,7 +464,7 @@
               },
               {
                 "name": "_SessionHostParameters",
-                "value": "[string(createObject('Location', parameters('SessionHostsRegion'), 'AvailabilityZones', parameters('AvailabilityZones'), 'VMSize', parameters('SessionHostSize'), 'AcceleratedNetworking', parameters('AcceleratedNetworking'), 'DiskType', parameters('SessionHostDiskType'), 'ImageReference', variables('varImageReference'), 'SecurityProfile', variables('varSecurityProfile'), 'SubnetId', parameters('SubnetId'), 'DomainJoinObject', variables('varDomainJoinObject'), 'DomainJoinPassword', if(equals(parameters('IdentityServiceProvider'), 'EntraID'), null(), createObject('reference', createObject('keyVault', createObject('id', reference(resourceId('Microsoft.Resources/deployments', 'deployKeyVault'), '2022-09-01').outputs.keyVaultId.value), 'secretName', 'DomainJoinPassword'))), 'AdminUsername', parameters('LocalAdminUsername'), 'tags', createObject()))]"
+                "value": "[string(variables('varSessionHostTemplateParameters'))]"
               },
               {
                 "name": "_SubscriptionId",
@@ -715,89 +736,8 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/deployments', 'deployKeyVault')]",
         "[resourceId('Microsoft.Resources/deployments', 'deployStandardSessionHostTemplate')]"
       ]
-    },
-    {
-      "condition": "[not(equals(parameters('IdentityServiceProvider'), 'EntraID'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
-      "name": "deployKeyVault",
-      "properties": {
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "mode": "Incremental",
-        "parameters": {
-          "Location": {
-            "value": "[parameters('Location')]"
-          },
-          "KeyVaultName": {
-            "value": "[format('kvavdsh-{0}', variables('varUniqueString'))]"
-          },
-          "DomainJoinPassword": {
-            "value": "[parameters('ADJoinUserPassword')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "metadata": {
-            "_generator": {
-              "name": "bicep",
-              "version": "0.27.1.19265",
-              "templateHash": "2524519128832046544"
-            }
-          },
-          "parameters": {
-            "Location": {
-              "type": "string",
-              "defaultValue": "[resourceGroup().location]"
-            },
-            "KeyVaultName": {
-              "type": "string"
-            },
-            "DomainJoinPassword": {
-              "type": "securestring"
-            }
-          },
-          "resources": [
-            {
-              "type": "Microsoft.KeyVault/vaults/secrets",
-              "apiVersion": "2023-07-01",
-              "name": "[format('{0}/{1}', parameters('KeyVaultName'), 'DomainJoinPassword')]",
-              "properties": {
-                "value": "[parameters('DomainJoinPassword')]"
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.KeyVault/vaults",
-              "apiVersion": "2023-07-01",
-              "name": "[parameters('KeyVaultName')]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "sku": {
-                  "family": "A",
-                  "name": "standard"
-                },
-                "tenantId": "[subscription().tenantId]",
-                "enabledForTemplateDeployment": true,
-                "enableRbacAuthorization": true
-              }
-            }
-          ],
-          "outputs": {
-            "keyVaultId": {
-              "type": "string",
-              "value": "[resourceId('Microsoft.KeyVault/vaults', parameters('KeyVaultName'))]"
-            }
-          }
-        }
-      }
     },
     {
       "type": "Microsoft.Resources/deployments",

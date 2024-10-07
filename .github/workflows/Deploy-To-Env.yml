@@ -7,8 +7,8 @@ on:
             type: choice
             description: Choose environment to deploy
             options: 
-            - TEST
-            - PROD
+            - Test
+            - Prod
 
 jobs:
   deploy:
@@ -38,7 +38,8 @@ jobs:
              -ResourceGroupName '${{ secrets.AVD_HOST_POOL_RG }}' `
              -SessionHostResourceGroupName '${{ secrets.AVD_SESSION_HOST_RG }}' `
              -HostPoolName '${{ secrets.AVD_HOST_POOL_NAME }}' `
-             -LocalAdminUserName '${{ secrets.LOCAL_ADMIN_USER }}'
+             -LocalAdminUserName '${{ secrets.LOCAL_ADMIN_USER }}' `
+             -KeyVaultName 'kv-sc3-avdx-${{ github.event.inputs.environment }}-use2'
             azPSVersion: "latest"
             errorActionPreference: continue
 

@@ -8,7 +8,8 @@ param (
     [string]$ResourceGroupName,
     [string]$SessionHostResourceGroupName,
     [string]$HostPoolName,
-    [string]$LocalAdminUserName
+    [string]$LocalAdminUserName,
+    [string]$KeyVaultName
 )
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
@@ -17,6 +18,8 @@ $TemplateParameters = @{
     EnableMonitoring                             = $true
     UseExistingLAW                               = $true
     LogAnalyticsWorkspaceId = $LogAnalyticsWorkspaceId # Only required if UseExistingLAW is $true. Use ResourceID
+
+    KeyVaultName = $KeyVaultName
 
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName

@@ -145,6 +145,10 @@ param SessionHostResourceGroupName string = ''
 
 param TimeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
 
+@description('Existing key vault name to use for retrieving domain join password.')
+param KeyVaultName string
+
+
 /////////////////
 
 //---- Variables ----//
@@ -258,9 +262,9 @@ var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID'
   : {
       reference: {
         keyVault: {
-          id: deployKeyVault.outputs.keyVaultId
+          id: deployKeyVault.id
         }
-        secretName: 'DomainJoinPassword'
+        secretName: 'domainJoinUserPassword'
       }
     }
 var varSessionHostTemplateParameters = {
@@ -458,13 +462,18 @@ module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
-module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvider != 'EntraID') {
-  name: 'deployKeyVault'
-  params: {
-    Location: Location
-    KeyVaultName: 'kvavdsh-${varUniqueString}'
-    DomainJoinPassword: ADJoinUserPassword
-  }
+// module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvider != 'EntraID') {
+//   name: 'deployKeyVault'
+//   params: {
+//     Location: Location
+//     KeyVaultName: 'kvavdsh-${varUniqueString}'
+//     DomainJoinPassword: ADJoinUserPassword
+//   }
+// }
+
+resource deployKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: KeyVaultName
+  scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroupName}')
 }
 
 module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec-arpah.bicep' = {
