@@ -39,7 +39,8 @@ jobs:
              -SessionHostResourceGroupName '${{ secrets.AVD_SESSION_HOST_RG }}' `
              -HostPoolName '${{ secrets.AVD_HOST_POOL_NAME }}' `
              -LocalAdminUserName '${{ secrets.LOCAL_ADMIN_USER }}' `
-             -KeyVaultName 'kv-sc3-avdx-${{ github.event.inputs.environment }}-use2'
+             -KeyVaultName 'kv-sc3-avdx-${{ github.event.inputs.environment }}-use2' `
+             -AppPoolType 'SessionDesktop' 
             azPSVersion: "latest"
             errorActionPreference: continue
 
@@ -57,6 +58,8 @@ jobs:
       #         -SessionHostResourceGroupName '${{ secrets.AVD_SESSION_HOST_RG }}' `
       #         -HostPoolName '${{ secrets.AVD_REMOTE_APPS_HOST_POOL_NAME }}' `
       #         -LocalAdminUserName '${{ secrets.LOCAL_ADMIN_USER }}'
+                # -KeyVaultName 'kv-sc3-avdx-${{ github.event.inputs.environment }}-use2' `
+                # -AppPoolType 'RemoteApp' 
       #       azPSVersion: "latest"
       #       errorActionPreference: continue
             

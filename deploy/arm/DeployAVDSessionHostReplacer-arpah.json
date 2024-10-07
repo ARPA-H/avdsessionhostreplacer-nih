@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "8248255568920168231"
+      "templateHash": "16723768796559973109"
     }
   },
   "parameters": {
@@ -302,6 +302,16 @@
       "metadata": {
         "description": "Existing key vault name to use for retrieving domain join password."
       }
+    },
+    "AppPoolType": {
+      "type": "string",
+      "allowedValues": [
+        "SessionDesktop",
+        "RemoteApp"
+      ],
+      "metadata": {
+        "description": "SessionDesktop or RemoteApp"
+      }
     }
   },
   "variables": {
@@ -402,8 +412,7 @@
     ],
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
-    "varUniqueString": "[uniqueString(resourceGroup().id, parameters('TimeStamp'))]",
-    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', uniqueString(resourceGroup().id, parameters('HostPoolName')))]",
+    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', parameters('AppPoolType'))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
   "resources": [

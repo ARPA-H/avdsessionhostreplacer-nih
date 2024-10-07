@@ -9,7 +9,8 @@ param (
     [string]$SessionHostResourceGroupName,
     [string]$HostPoolName,
     [string]$LocalAdminUserName,
-    [string]$KeyVaultName
+    [string]$KeyVaultName,
+    [string]$AppPoolType
 )
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
@@ -20,6 +21,7 @@ $TemplateParameters = @{
     LogAnalyticsWorkspaceId = $LogAnalyticsWorkspaceId # Only required if UseExistingLAW is $true. Use ResourceID
 
     KeyVaultName = $KeyVaultName
+    AppPoolType = $AppPoolType # 'SessionDesktop' or 'RemoteApp'
 
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName

@@ -148,6 +148,13 @@ param TimeStamp string = utcNow() // Used for unique deployment names. Do Not su
 @description('Existing key vault name to use for retrieving domain join password.')
 param KeyVaultName string
 
+@allowed([
+  'SessionDesktop'
+  'RemoteApp'
+])
+@description('SessionDesktop or RemoteApp')
+param AppPoolType string
+
 
 /////////////////
 
@@ -422,9 +429,10 @@ var varReplacementPlanSettings = [
 ]
 
 //var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
-var varUniqueString = uniqueString(resourceGroup().id, TimeStamp)
+//var varUniqueString = uniqueString(resourceGroup().id, TimeStamp)
 
-var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
+//var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
+var varFunctionAppName = 'AVDSessionHostReplacer-${AppPoolType}'
 
 var varFunctionAppIdentity = UseUserAssignedManagedIdentity
   ? {
