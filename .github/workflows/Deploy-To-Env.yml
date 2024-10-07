@@ -40,7 +40,10 @@ jobs:
              -HostPoolName '${{ secrets.AVD_HOST_POOL_NAME }}' `
              -LocalAdminUserName '${{ secrets.LOCAL_ADMIN_USER }}' `
              -KeyVaultName 'kv-sc3-avdx-${{ github.event.inputs.environment }}-use2' `
-             -AppPoolType 'SessionDesktop' 
+             -AppPoolType 'SessionDesktop' `
+             -BaseScriptUri 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/deployment/workload/' `
+             -FslogixStorageName 'stfslavdxtbiz' `
+             -FslogixFileShareName 'fslogix-pc-app1-${{ github.event.inputs.environment }}-use2-001'
             azPSVersion: "latest"
             errorActionPreference: stop
 

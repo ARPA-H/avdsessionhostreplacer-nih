@@ -10,7 +10,11 @@ param (
     [string]$HostPoolName,
     [string]$LocalAdminUserName,
     [string]$KeyVaultName,
-    [string]$AppPoolType
+    [string]$AppPoolType,
+    [string]$BaseScriptUri,
+    [string]$FslogixStorageName,
+    [string]$FslogixFileShareName
+
 )
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
@@ -25,7 +29,10 @@ $TemplateParameters = @{
 
     KeyVaultName = $KeyVaultName
     AppPoolType = $AppPoolType # 'SessionDesktop' or 'RemoteApp'
-
+    BaseScriptUri = $BaseScriptUri
+    FslogixStorageName = $FslogixStorageName
+    FslogixFileShareName = $FslogixFileShareName
+    
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName
     HostPoolResourceGroupName                    = $ResourceGroupName

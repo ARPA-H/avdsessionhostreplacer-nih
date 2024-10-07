@@ -155,6 +155,15 @@ param KeyVaultName string = ''
 @description('SessionDesktop or RemoteApp')
 param AppPoolType string = 'SessionDesktop'
 
+@sys.description('Required, the storage account name for the FSLogix profile container')
+param FslogixStorageName string
+
+@sys.description('Required, the file share name for the FSLogix profile container')
+param FslogixFileShareName string
+
+@sys.description('Required, the file for configuring the session host')
+param BaseScriptUri string
+
 /////////////////
 
 //---- Variables ----//
@@ -285,6 +294,10 @@ var varSessionHostTemplateParameters = {
   DomainJoinObject: varDomainJoinObject
   DomainJoinPassword: varDomainJoinPasswordReference
   AdminUsername: LocalAdminUsername
+  BaseScriptUri: BaseScriptUri
+  FslogixStorageName: FslogixStorageName
+  FslogixFileShareName: FslogixFileShareName
+  
   tags: {}
 }
 // This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()

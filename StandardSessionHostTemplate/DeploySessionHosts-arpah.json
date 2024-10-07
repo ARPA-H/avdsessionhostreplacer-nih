@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "16251165264441538978"
+      "templateHash": "17472281685812872036"
     }
   },
   "parameters": {
@@ -63,6 +63,24 @@
     "DomainJoinPassword": {
       "type": "securestring",
       "defaultValue": ""
+    },
+    "FslogixStorageName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the storage account name for the FSLogix profile container"
+      }
+    },
+    "FslogixFileShareName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the file share name for the FSLogix profile container"
+      }
+    },
+    "BaseScriptUri": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the file for configuring the session host"
+      }
     }
   },
   "resources": [
@@ -125,6 +143,15 @@
           "AvailabilityZones": {
             "value": "[parameters('AvailabilityZones')]"
           },
+          "BaseScriptUri": {
+            "value": "[parameters('BaseScriptUri')]"
+          },
+          "FslogixStorageName": {
+            "value": "[parameters('FslogixStorageName')]"
+          },
+          "FslogixFileShareName": {
+            "value": "[parameters('FslogixFileShareName')]"
+          },
           "Tags": {
             "value": "[parameters('Tags')]"
           }
@@ -136,7 +163,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "15320945764234171862"
+              "templateHash": "14850414887640494457"
             }
           },
           "parameters": {
@@ -197,25 +224,29 @@
               "type": "securestring",
               "defaultValue": ""
             },
-            "avdIdentityServiceProvider": {
+            "AVDIdentityServiceProvider": {
               "type": "string",
               "defaultValue": "ADDS",
               "metadata": {
                 "description": "Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)"
               }
             },
-            "varFslogixStorageName": {
+            "FslogixStorageName": {
               "type": "string",
-              "defaultValue": "stfslavdxtbiz",
               "metadata": {
                 "description": "Required, the storage account name for the FSLogix profile container"
               }
             },
-            "varFslogixFileShareName": {
+            "FslogixFileShareName": {
               "type": "string",
-              "defaultValue": "fslogix-pc-app1-test-use2-001",
               "metadata": {
                 "description": "Required, the file share name for the FSLogix profile container"
+              }
+            },
+            "BaseScriptUri": {
+              "type": "string",
+              "metadata": {
+                "description": "Required, the file for configuring the session host"
               }
             }
           },
@@ -223,14 +254,12 @@
             "varRequireNvidiaGPU": "[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
             "varVMNumber": "[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
             "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]",
-            "varBaseScriptUri": "https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/main/workload/",
-            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration.ps1', variables('varBaseScriptUri'))]",
+            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration.ps1', parameters('BaseScriptUri'))]",
             "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration.ps1",
-            "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('varFslogixStorageName'), environment().suffixes.storage, parameters('varFslogixFileShareName'))]",
-            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('varFslogixStorageName'), environment().suffixes.storage)]",
+            "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
+            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
             "fslogix": true,
-            "identityDomainName": "nih.gov",
-            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', variables('identityDomainName'), variables('varAmdVmSize'), parameters('avdIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
+            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
             "varAmdVmSizes": [
               "Standard_NV4as_v4",
               "Standard_NV8as_v4",
@@ -451,7 +480,7 @@
             {
               "type": "Microsoft.Compute/virtualMachines/extensions",
               "apiVersion": "2023-09-01",
-              "name": "[format('{0}/{1}', parameters('VMName'), parameters('VMName'))]",
+              "name": "[format('{0}/{1}', parameters('VMName'), 'SH-Config')]",
               "location": "[parameters('Location')]",
               "properties": {
                 "publisher": "Microsoft.Compute",

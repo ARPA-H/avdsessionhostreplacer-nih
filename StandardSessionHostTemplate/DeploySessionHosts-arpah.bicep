@@ -30,6 +30,15 @@ param DomainJoinObject object = {}
 @secure()
 param DomainJoinPassword string = ''
 
+@sys.description('Required, the storage account name for the FSLogix profile container')
+param FslogixStorageName string
+
+@sys.description('Required, the file share name for the FSLogix profile container')
+param FslogixFileShareName string
+
+@sys.description('Required, the file for configuring the session host')
+param BaseScriptUri string
+
 module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm in VMNames: {
   name: 'deploySessionHost-${vm}'
   params: {
@@ -48,6 +57,10 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     DomainJoinPassword: DomainJoinPassword
     Location: Location
     AvailabilityZones: AvailabilityZones
+    BaseScriptUri: BaseScriptUri
+    FslogixStorageName: FslogixStorageName
+    FslogixFileShareName: FslogixFileShareName
+    
     Tags: Tags
   }
 }]

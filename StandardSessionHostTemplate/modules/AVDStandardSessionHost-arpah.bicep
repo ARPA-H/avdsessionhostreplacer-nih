@@ -30,17 +30,18 @@ param DomainJoinObject object = {}
 @secure()
 param DomainJoinPassword string = ''
 
-// @sys.description('Do not modify, used to set unique value for resource deployment.')
-// param Time string = utcNow()
-
+// params for ARPA-H
 @sys.description('Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)')
-param avdIdentityServiceProvider string = 'ADDS'
+param AVDIdentityServiceProvider string = 'ADDS'
 
 @sys.description('Required, the storage account name for the FSLogix profile container')
-param varFslogixStorageName string = 'stfslavdxtbiz'
+param FslogixStorageName string
 
 @sys.description('Required, the file share name for the FSLogix profile container')
-param varFslogixFileShareName string = 'fslogix-pc-app1-test-use2-001'
+param FslogixFileShareName string
+
+@sys.description('Required, the file for configuring the session host')
+param BaseScriptUri string
 
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
@@ -55,22 +56,17 @@ var varVMNumber = int(
 
 var varAvailabilityZone = AvailabilityZones == [] ? [] : [ '${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}' ]
 
-
-var varBaseScriptUri = 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/main/workload/'
-var varSessionHostConfigurationScriptUri = '${varBaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
+var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
 var varSessionHostConfigurationScript = './Set-SessionHostConfiguration.ps1'
-
-@sys.description('Required, the path to the FSLogix profile container')
-var varFslogixSharePath = '\\\\${varFslogixStorageName}.file.${environment().suffixes.storage}\\${varFslogixFileShareName}' 
-
-@sys.description('Required, the FQDN of the storage account for the FSLogix profile container')
-var varFslogixStorageFqdn = '${varFslogixStorageName}.file.${environment().suffixes.storage}'
-
+var varFslogixSharePath = '\\\\${FslogixStorageName}.file.${environment().suffixes.storage}\\${FslogixFileShareName}' 
+var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
 var fslogix = true
-var identityDomainName = 'nih.gov'
+
+//var identityDomainName = 'nih.gov'
 //var identityServiceProvider = 'ADDS'
 
-var varScriptArguments = '-IdentityDomainName ${identityDomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${avdIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+//var varScriptArguments = '-IdentityDomainName ${identityDomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${avdIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
 var varAmdVmSizes = [
   'Standard_NV4as_v4'
   'Standard_NV8as_v4'
@@ -200,108 +196,77 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     dependsOn: [ deployIntegrityMonitoring ]
   }
 
-  // module vmss_azureMonitorAgentExtension 'extension/main.bicep' =
-  // if (extensionMonitoringAgentConfig.enabled) {
-  //   name: '${uniqueString(deployment().name, location)}-VMSS-AzureMonitorAgent'
-  //   params: {
-  //     virtualMachineScaleSetName: vmss.name
-  //     name: 'AzureMonitorAgent'
-  //     publisher: 'Microsoft.Azure.Monitor'
-  //     type: osType == 'Windows' ? 'AzureMonitorWindowsAgent' : 'AzureMonitorLinuxAgent'
-  //     typeHandlerVersion: contains(extensionMonitoringAgentConfig, 'typeHandlerVersion')
-  //       ? extensionMonitoringAgentConfig.typeHandlerVersion
-  //       : (osType == 'Windows' ? '1.22' : '1.29')
-  //     autoUpgradeMinorVersion: contains(extensionMonitoringAgentConfig, 'autoUpgradeMinorVersion')
-  //       ? extensionMonitoringAgentConfig.autoUpgradeMinorVersion
-  //       : true
-  //     enableAutomaticUpgrade: contains(extensionMonitoringAgentConfig, 'enableAutomaticUpgrade')
-  //       ? extensionMonitoringAgentConfig.enableAutomaticUpgrade
-  //       : false
-  //     settings: {
-  //       workspaceId: !empty(monitoringWorkspaceId)
-  //         ? reference(vmss_logAnalyticsWorkspace.id, vmss_logAnalyticsWorkspace.apiVersion).customerId
-  //         : ''
-  //       GCS_AUTO_CONFIG: osType == 'Linux' ? true : null
-  //     }
-  //     protectedSettings: {
-  //       workspaceKey: !empty(monitoringWorkspaceId) ? vmss_logAnalyticsWorkspace.listKeys().primarySharedKey : ''
-  //     }
-  //   }
-  //   dependsOn: [
-  //     vmss_microsoftAntiMalwareExtension
-  //   ]
-  // }
-
-// HostPool join 
-resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
-  // Documentation is available here: https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-template
-  // TODO: Update to the new format for DSC extension, see documentation above.
-  name: 'JoinHostPool'
-  location: Location
-  properties: {
-    publisher: 'Microsoft.PowerShell'
-    type: 'DSC'
-    typeHandlerVersion: '2.77'
-    autoUpgradeMinorVersion: true
-    settings: {
-      modulesUrl: WVDArtifactsURL
-      configurationFunction: 'Configuration.ps1\\AddSessionHost'
-      properties: {
-        hostPoolName: HostPoolName
-        registrationInfoToken: HostPoolToken
-        aadJoin: DomainJoinObject.DomainType == 'EntraID' ? true : false
-        useAgentDownloadEndpoint: true
-        mdmId: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? '0000000a-0000-0000-c000-000000000000' : '') : ''
+  // HostPool join 
+  resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
+    // Documentation is available here: https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-template
+    // TODO: Update to the new format for DSC extension, see documentation above.
+    name: 'JoinHostPool'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.PowerShell'
+      type: 'DSC'
+      typeHandlerVersion: '2.77'
+      autoUpgradeMinorVersion: true
+      settings: {
+        modulesUrl: WVDArtifactsURL
+        configurationFunction: 'Configuration.ps1\\AddSessionHost'
+        properties: {
+          hostPoolName: HostPoolName
+          registrationInfoToken: HostPoolToken
+          aadJoin: DomainJoinObject.DomainType == 'EntraID' ? true : false
+          useAgentDownloadEndpoint: true
+          mdmId: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? '0000000a-0000-0000-c000-000000000000' : '') : ''
+        }
       }
     }
+    dependsOn: [ deployGPUDriversNvidia ]
   }
-  dependsOn: [ deployGPUDriversNvidia ]
-}
   
-// Domain Join //
-resource AADJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'EntraID') {
-  name: 'AADLoginForWindows'
-  location: Location
-  properties: {
-    publisher: 'Microsoft.Azure.ActiveDirectory'
-    type: 'AADLoginForWindows'
-    typeHandlerVersion: '2.0'
-    autoUpgradeMinorVersion: true
-    settings: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? { mdmId: '0000000a-0000-0000-c000-000000000000' } : null) : null
-  }
-  dependsOn: [ AddWVDHost ]
-}
-
-resource DomainJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'ActiveDirectory') {
-  // Documentation is available here: https://docs.microsoft.com/en-us/azure/active-directory-domain-services/join-windows-vm-template#azure-resource-manager-template-overview
-  name: 'DomainJoin'
-  location: Location
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'JSonADDomainExtension'
-    typeHandlerVersion: '1.3'
-    autoUpgradeMinorVersion: true
-    settings: {
-      Name: DomainJoinObject.DomainName
-      OUPath: DomainJoinObject.ADOUPath
-      User: '${DomainJoinObject.DomainName}\\${DomainJoinObject.DomainJoinUserName}'
-      Restart: 'true'
-
-      //will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx'
-      Options: 3
+  // Domain Join //
+  resource AADJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'EntraID') {
+    name: 'AADLoginForWindows'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Azure.ActiveDirectory'
+      type: 'AADLoginForWindows'
+      typeHandlerVersion: '2.0'
+      autoUpgradeMinorVersion: true
+      settings: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? { mdmId: '0000000a-0000-0000-c000-000000000000' } : null) : null
     }
-    protectedSettings: {
-      Password: DomainJoinPassword //TODO: Test domain join from keyvault option
-    }
+    dependsOn: [ AddWVDHost ]
   }
-  dependsOn: [ AddWVDHost ]
-}
-tags: Tags
+
+  resource DomainJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'ActiveDirectory') {
+    // Documentation is available here: https://docs.microsoft.com/en-us/azure/active-directory-domain-services/join-windows-vm-template#azure-resource-manager-template-overview
+    name: 'DomainJoin'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Compute'
+      type: 'JSonADDomainExtension'
+      typeHandlerVersion: '1.3'
+      autoUpgradeMinorVersion: true
+      settings: {
+        Name: DomainJoinObject.DomainName
+        OUPath: DomainJoinObject.ADOUPath
+        User: '${DomainJoinObject.DomainName}\\${DomainJoinObject.DomainJoinUserName}'
+        Restart: 'true'
+
+        //will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx'
+        Options: 3
+      }
+      protectedSettings: {
+        Password: DomainJoinPassword //TODO: Test domain join from keyvault option
+      }
+    }
+    dependsOn: [ AddWVDHost ]
+  }
+  tags: Tags
 }
 
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
   //name: 'SH-Config/${VMName}'
-  name: VMName
+  //name: VMName
+  name:'SH-Config'
   location: Location
   parent: VM
   properties: {
