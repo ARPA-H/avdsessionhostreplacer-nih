@@ -13,7 +13,8 @@ param (
     [string]$AppPoolType,
     [string]$BaseScriptUri,
     [string]$FslogixStorageName,
-    [string]$FslogixFileShareName
+    [string]$FslogixFileShareName,
+    [string]$VMPostFix
 
 )
 
@@ -37,7 +38,7 @@ $TemplateParameters = @{
     HostPoolName                                 = $HostPoolName
     HostPoolResourceGroupName                    = $ResourceGroupName
     #SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
-    SessionHostNamePrefix                        = 'arpahavdn' # Will be appended by '-XX'
+    SessionHostNamePrefix                        = "arpah$VMPostFix" # Will be appended by '-XX'
     TargetSessionHostCount                       = 2 # How many session hosts to maintain in the Host Pool
     TargetSessionHostBuffer                      = 1 # The maximum number of session hosts to add during a replacement process
     IncludePreExistingSessionHosts               = $false # Include existing session hosts in automation

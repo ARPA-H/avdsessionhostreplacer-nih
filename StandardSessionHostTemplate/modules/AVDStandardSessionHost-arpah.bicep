@@ -62,10 +62,6 @@ var varFslogixSharePath = '\\\\${FslogixStorageName}.file.${environment().suffix
 var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
 var fslogix = true
 
-//var identityDomainName = 'nih.gov'
-//var identityServiceProvider = 'ADDS'
-
-//var varScriptArguments = '-IdentityDomainName ${identityDomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${avdIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
 var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
 var varAmdVmSizes = [
   'Standard_NV4as_v4'
@@ -93,7 +89,6 @@ var varNvidiaVmSizes = [
   'Standard_NV72ads_A10_v5'
 ]
 var varNvidiaVmSize = contains(varNvidiaVmSizes, VMSize)
-
 
 resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   name: '${VMName}-vNIC'
@@ -264,8 +259,6 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
 }
 
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
-  //name: 'SH-Config/${VMName}'
-  //name: VMName
   name:'SH-Config'
   location: Location
   parent: VM
