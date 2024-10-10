@@ -39,6 +39,9 @@ param FslogixFileShareName string
 @sys.description('Required, the file for configuring the session host')
 param BaseScriptUri string
 
+@sys.description('Required, the name of the virtual machine scale set')
+param VmssName string
+
 module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm in VMNames: {
   name: 'deploySessionHost-${vm}'
   params: {
@@ -60,7 +63,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     BaseScriptUri: BaseScriptUri
     FslogixStorageName: FslogixStorageName
     FslogixFileShareName: FslogixFileShareName
-    
+    VmssName: VmssName
     Tags: Tags
   }
 }]

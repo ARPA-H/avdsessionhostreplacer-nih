@@ -164,6 +164,8 @@ param FslogixFileShareName string
 @sys.description('Required, the file for configuring the session host')
 param BaseScriptUri string
 
+@sys.description('Required, the name of the virtual machine scale set')
+param VmssName string
 /////////////////
 
 //---- Variables ----//
@@ -297,6 +299,7 @@ var varSessionHostTemplateParameters = {
   BaseScriptUri: BaseScriptUri
   FslogixStorageName: FslogixStorageName
   FslogixFileShareName: FslogixFileShareName
+  VmssName: VmssName
   
   tags: {}
 }

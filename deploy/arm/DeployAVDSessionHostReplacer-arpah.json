@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "9889499643636221262"
+      "templateHash": "14552523335571460527"
     }
   },
   "parameters": {
@@ -332,6 +332,12 @@
       "metadata": {
         "description": "Required, the file for configuring the session host"
       }
+    },
+    "VmssName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the name of the virtual machine scale set"
+      }
     }
   },
   "variables": {
@@ -426,6 +432,7 @@
       "BaseScriptUri": "[parameters('BaseScriptUri')]",
       "FslogixStorageName": "[parameters('FslogixStorageName')]",
       "FslogixFileShareName": "[parameters('FslogixFileShareName')]",
+      "VmssName": "[parameters('VmssName')]",
       "tags": {}
     },
     "varAzureEnvironments": [
@@ -795,7 +802,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "1559551197977604109"
+              "templateHash": "5209508444848164626"
             }
           },
           "parameters": {
@@ -815,7 +822,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.30.23.60470",
-                  "templateHash": "17472281685812872036"
+                  "templateHash": "15508445743976294717"
                 }
               },
               "parameters": {
@@ -891,6 +898,12 @@
                   "metadata": {
                     "description": "Required, the file for configuring the session host"
                   }
+                },
+                "VmssName": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "Required, the name of the virtual machine scale set"
+                  }
                 }
               },
               "resources": [
@@ -962,6 +975,9 @@
                       "FslogixFileShareName": {
                         "value": "[[parameters('FslogixFileShareName')]"
                       },
+                      "VmssName": {
+                        "value": "[[parameters('VmssName')]"
+                      },
                       "Tags": {
                         "value": "[[parameters('Tags')]"
                       }
@@ -973,7 +989,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.30.23.60470",
-                          "templateHash": "14850414887640494457"
+                          "templateHash": "7227213248442589302"
                         }
                       },
                       "parameters": {
@@ -1057,6 +1073,12 @@
                           "type": "string",
                           "metadata": {
                             "description": "Required, the file for configuring the session host"
+                          }
+                        },
+                        "VmssName": {
+                          "type": "string",
+                          "metadata": {
+                            "description": "Required, the name of the virtual machine scale set"
                           }
                         }
                       },
@@ -1280,7 +1302,10 @@
                                 }
                               ]
                             },
-                            "licenseType": "Windows_Client"
+                            "licenseType": "Windows_Client",
+                            "virtualMachineScaleSet": {
+                              "id": "[[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
+                            }
                           },
                           "tags": "[[parameters('Tags')]",
                           "dependsOn": [

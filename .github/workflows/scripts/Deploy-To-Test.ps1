@@ -14,6 +14,7 @@ param (
     [string]$BaseScriptUri,
     [string]$FslogixStorageName,
     [string]$FslogixFileShareName,
+    [string]$VmssName,
     [string]$VMPostFix
 
 )
@@ -33,6 +34,7 @@ $TemplateParameters = @{
     BaseScriptUri = $BaseScriptUri
     FslogixStorageName = $FslogixStorageName
     FslogixFileShareName = $FslogixFileShareName
+    VmssName = $VmssName
     
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName

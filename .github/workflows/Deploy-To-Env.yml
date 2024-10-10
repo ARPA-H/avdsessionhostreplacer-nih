@@ -44,6 +44,7 @@ jobs:
              -BaseScriptUri 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/deployment/workload/' `
              -FslogixStorageName 'stfslavdxtbiz' `
              -FslogixFileShareName 'fslogix-pc-app1-${{ github.event.inputs.environment }}-use2-001' `
+             -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
              -VMPostFix 'sd'
             azPSVersion: "latest"
             errorActionPreference: stop
@@ -67,6 +68,7 @@ jobs:
               -BaseScriptUri 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/deployment/workload/' `
               -FslogixStorageName 'stfslavdxtbiz' `
               -FslogixFileShareName 'fslogix-pc-remoteapps-${{ github.event.inputs.environment }}-use2-001' `
+              -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
               -VMPostFix 'ra'
             azPSVersion: "latest"
             errorActionPreference: continue

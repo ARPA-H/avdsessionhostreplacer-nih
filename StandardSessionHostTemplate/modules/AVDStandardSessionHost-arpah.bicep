@@ -43,6 +43,10 @@ param FslogixFileShareName string
 @sys.description('Required, the file for configuring the session host')
 param BaseScriptUri string
 
+@sys.description('Required, the name of the virtual machine scale set')
+param VmssName string
+
+
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
 
@@ -109,6 +113,12 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   tags: Tags
 }
 
+// get existing vm ss
+resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
+  name: VmssName
+  //scope: resourceGroup(exampleRG)
+}
+
 resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: VMName
   location: Location
@@ -151,7 +161,9 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       ]
     }
     licenseType: 'Windows_Client'
-
+    virtualMachineScaleSet:{
+      id: vmssFlex.id
+    }
   }
   // Guest Attestation (Integrity Monitoring) //
   resource deployIntegrityMonitoring 'extensions@2023-09-01' = {
