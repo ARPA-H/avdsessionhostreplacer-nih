@@ -284,6 +284,7 @@ var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID'
         secretName: 'domainJoinUserPassword'
       }
     }
+
 var varSessionHostTemplateParameters = {
   Location: SessionHostsRegion
   AvailabilityZones: AvailabilityZones
@@ -300,6 +301,7 @@ var varSessionHostTemplateParameters = {
   FslogixStorageName: FslogixStorageName
   FslogixFileShareName: FslogixFileShareName
   VmssName: VmssName
+  HostPoolResourceGroup: HostPoolResourceGroupName
   
   tags: {}
 }
@@ -443,9 +445,6 @@ var varReplacementPlanSettings = [
   }
 ]
 
-//var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
-//var varUniqueString = uniqueString(resourceGroup().id, TimeStamp)
-
 //var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
 var varFunctionAppName = 'AVDSessionHostReplacer-${AppPoolType}'
 
@@ -540,16 +539,6 @@ module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssigne
     PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
     RoleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
     Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
-  }
-}
-
-module RBACVmContributor 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
-  name: 'RBAC-TemplateSpecReader-${TimeStamp}'
-  scope: subscription()
-  params: {
-    PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
-    RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
-    Scope: subscription().id
   }
 }
 

@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "15508445743976294717"
+      "templateHash": "2182092521286152733"
     }
   },
   "parameters": {
@@ -87,6 +87,12 @@
       "metadata": {
         "description": "Required, the name of the virtual machine scale set"
       }
+    },
+    "HostPoolResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, Host Pool Resource Group"
+      }
     }
   },
   "resources": [
@@ -161,6 +167,9 @@
           "VmssName": {
             "value": "[parameters('VmssName')]"
           },
+          "HostPoolResourceGroup": {
+            "value": "[parameters('HostPoolResourceGroup')]"
+          },
           "Tags": {
             "value": "[parameters('Tags')]"
           }
@@ -172,7 +181,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "7227213248442589302"
+              "templateHash": "16142674449750308807"
             }
           },
           "parameters": {
@@ -262,6 +271,12 @@
               "type": "string",
               "metadata": {
                 "description": "Required, the name of the virtual machine scale set"
+              }
+            },
+            "HostPoolResourceGroup": {
+              "type": "string",
+              "metadata": {
+                "description": "Required, Host Pool Resource Group"
               }
             }
           },
@@ -419,6 +434,7 @@
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
+                "[subscriptionResourceId('Microsoft.Resources/deployments', 'RBAC-VMContributor')]",
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             },
@@ -515,6 +531,63 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "RBAC-VMContributor",
+              "subscriptionId": "[subscription().subscriptionId]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "PrinicpalId": {
+                    "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', subscription().subscriptionId), format('{0}', parameters('HostPoolResourceGroup'))), 'Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName')), '2024-03-01', 'full').identity.principalId]"
+                  },
+                  "RoleDefinitionId": {
+                    "value": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
+                  },
+                  "Scope": {
+                    "value": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.30.23.60470",
+                      "templateHash": "2574188172202499390"
+                    }
+                  },
+                  "parameters": {
+                    "PrinicpalId": {
+                      "type": "string"
+                    },
+                    "RoleDefinitionId": {
+                      "type": "string"
+                    },
+                    "Scope": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Authorization/roleAssignments",
+                      "apiVersion": "2022-04-01",
+                      "name": "[guid(parameters('PrinicpalId'), parameters('RoleDefinitionId'), parameters('Scope'))]",
+                      "properties": {
+                        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
+                        "principalId": "[parameters('PrinicpalId')]"
+                      }
+                    }
+                  ]
+                }
+              }
             }
           ]
         }

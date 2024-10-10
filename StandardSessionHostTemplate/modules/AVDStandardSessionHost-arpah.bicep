@@ -46,6 +46,8 @@ param BaseScriptUri string
 @sys.description('Required, the name of the virtual machine scale set')
 param VmssName string
 
+@sys.description('Required, Host Pool Resource Group')
+param HostPoolResourceGroup string
 
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
@@ -116,8 +118,32 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
 // get existing vm ss
 resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
   name: VmssName
-  //scope: resourceGroup(exampleRG)
 }
+
+resource functionApp 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
+  name: VmssName
+  scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroup}')
+}
+
+module RBACVmContributor '../../deploy/bicep/modules/RBACRoleAssignment.bicep' =  {
+  name: 'RBAC-VMContributor'
+  scope: subscription()
+  params: {
+    PrinicpalId: functionApp.identity.principalId
+    RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
+    Scope: vmssFlex.id
+  }
+}
+
+// module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
+//   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
+//   scope: subscription()
+//   params: {
+//     PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
+//     RoleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
+//     Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
+//   }
+// }
 
 resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: VMName
@@ -265,7 +291,10 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
         Password: DomainJoinPassword //TODO: Test domain join from keyvault option
       }
     }
-    dependsOn: [ AddWVDHost ]
+    dependsOn: [ 
+      AddWVDHost 
+      RBACVmContributor
+    ]
   }
   tags: Tags
 }

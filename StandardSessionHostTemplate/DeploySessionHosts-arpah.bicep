@@ -42,6 +42,9 @@ param BaseScriptUri string
 @sys.description('Required, the name of the virtual machine scale set')
 param VmssName string
 
+@sys.description('Required, Host Pool Resource Group')
+param HostPoolResourceGroup string
+
 module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm in VMNames: {
   name: 'deploySessionHost-${vm}'
   params: {
@@ -64,6 +67,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     FslogixStorageName: FslogixStorageName
     FslogixFileShareName: FslogixFileShareName
     VmssName: VmssName
+    HostPoolResourceGroup: HostPoolResourceGroup
     Tags: Tags
   }
 }]
