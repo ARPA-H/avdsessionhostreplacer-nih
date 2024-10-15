@@ -532,7 +532,24 @@ module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = if (
     RoleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
     Scope: subscription().id
   }
+  dependsOn: [
+    deployFunctionApp
+  ]
 }
+
+module RoleAssignmentsVMContributor 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
+  name: 'RBAC-VMContributor-${TimeStamp}'
+  scope: subscription()
+  params: {
+    PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
+    RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
+    Scope: subscription().id
+  }
+  dependsOn: [
+    deployFunctionApp
+  ]
+}
+
 module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
   scope: subscription()
