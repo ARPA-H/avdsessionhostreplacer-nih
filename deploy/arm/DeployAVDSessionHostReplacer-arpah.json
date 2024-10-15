@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "15689773697764600613"
+      "templateHash": "2207551671312687817"
     }
   },
   "parameters": {
@@ -434,6 +434,7 @@
       "FslogixFileShareName": "[parameters('FslogixFileShareName')]",
       "VmssName": "[parameters('VmssName')]",
       "HostPoolResourceGroup": "[parameters('HostPoolResourceGroupName')]",
+      "FunctionAppName": "[variables('varFunctionAppName')]",
       "tags": {}
     },
     "varAzureEnvironments": [
@@ -803,7 +804,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "8987710873884448873"
+              "templateHash": "15060297278554403913"
             }
           },
           "parameters": {
@@ -823,7 +824,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.30.23.60470",
-                  "templateHash": "2182092521286152733"
+                  "templateHash": "17063193814007311111"
                 }
               },
               "parameters": {
@@ -911,6 +912,12 @@
                   "metadata": {
                     "description": "Required, Host Pool Resource Group"
                   }
+                },
+                "FunctionAppName": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "Required, Function App Name"
+                  }
                 }
               },
               "resources": [
@@ -988,6 +995,9 @@
                       "HostPoolResourceGroup": {
                         "value": "[[parameters('HostPoolResourceGroup')]"
                       },
+                      "FunctionAppName": {
+                        "value": "[[parameters('FunctionAppName')]"
+                      },
                       "Tags": {
                         "value": "[[parameters('Tags')]"
                       }
@@ -999,7 +1009,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.30.23.60470",
-                          "templateHash": "16142674449750308807"
+                          "templateHash": "11791326580709735893"
                         }
                       },
                       "parameters": {
@@ -1095,6 +1105,12 @@
                           "type": "string",
                           "metadata": {
                             "description": "Required, Host Pool Resource Group"
+                          }
+                        },
+                        "FunctionAppName": {
+                          "type": "string",
+                          "metadata": {
+                            "description": "Required, Function App Name"
                           }
                         }
                       },
@@ -1252,7 +1268,6 @@
                           },
                           "dependsOn": [
                             "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
-                            "[[subscriptionResourceId('Microsoft.Resources/deployments', 'RBAC-VMContributor')]",
                             "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                           ]
                         },
@@ -1275,6 +1290,15 @@
                             "enableAcceleratedNetworking": "[[parameters('AcceleratedNetworking')]"
                           },
                           "tags": "[[parameters('Tags')]"
+                        },
+                        {
+                          "type": "Microsoft.Authorization/roleAssignments",
+                          "apiVersion": "2022-04-01",
+                          "name": "[[guid(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '9980e02c-c2be-4d73-94e8-173b1dc7cf3c', resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName')))]",
+                          "properties": {
+                            "roleDefinitionId": "[[resourceId('Microsoft.Authorization/roleDefinitions', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')]",
+                            "principalId": "[[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId]"
+                          }
                         },
                         {
                           "type": "Microsoft.Compute/virtualMachines",
@@ -1349,63 +1373,6 @@
                           "dependsOn": [
                             "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                           ]
-                        },
-                        {
-                          "type": "Microsoft.Resources/deployments",
-                          "apiVersion": "2022-09-01",
-                          "name": "RBAC-VMContributor",
-                          "subscriptionId": "[[subscription().subscriptionId]",
-                          "location": "[[resourceGroup().location]",
-                          "properties": {
-                            "expressionEvaluationOptions": {
-                              "scope": "inner"
-                            },
-                            "mode": "Incremental",
-                            "parameters": {
-                              "PrinicpalId": {
-                                "value": "[[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', subscription().subscriptionId), format('{0}', parameters('HostPoolResourceGroup'))), 'Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName')), '2024-03-01', 'full').identity.principalId]"
-                              },
-                              "RoleDefinitionId": {
-                                "value": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
-                              },
-                              "Scope": {
-                                "value": "[[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
-                              }
-                            },
-                            "template": {
-                              "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-                              "contentVersion": "1.0.0.0",
-                              "metadata": {
-                                "_generator": {
-                                  "name": "bicep",
-                                  "version": "0.30.23.60470",
-                                  "templateHash": "2574188172202499390"
-                                }
-                              },
-                              "parameters": {
-                                "PrinicpalId": {
-                                  "type": "string"
-                                },
-                                "RoleDefinitionId": {
-                                  "type": "string"
-                                },
-                                "Scope": {
-                                  "type": "string"
-                                }
-                              },
-                              "resources": [
-                                {
-                                  "type": "Microsoft.Authorization/roleAssignments",
-                                  "apiVersion": "2022-04-01",
-                                  "name": "[[guid(parameters('PrinicpalId'), parameters('RoleDefinitionId'), parameters('Scope'))]",
-                                  "properties": {
-                                    "roleDefinitionId": "[[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
-                                    "principalId": "[[parameters('PrinicpalId')]"
-                                  }
-                                }
-                              ]
-                            }
-                          }
                         }
                       ]
                     }

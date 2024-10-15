@@ -45,6 +45,9 @@ param VmssName string
 @sys.description('Required, Host Pool Resource Group')
 param HostPoolResourceGroup string
 
+@sys.description('Required, Function App Name')
+param FunctionAppName string
+
 module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm in VMNames: {
   name: 'deploySessionHost-${vm}'
   params: {
@@ -68,6 +71,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     FslogixFileShareName: FslogixFileShareName
     VmssName: VmssName
     HostPoolResourceGroup: HostPoolResourceGroup
+    FunctionAppName: FunctionAppName
     Tags: Tags
   }
 }]

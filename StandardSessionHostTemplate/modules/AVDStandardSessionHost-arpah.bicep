@@ -49,6 +49,9 @@ param VmssName string
 @sys.description('Required, Host Pool Resource Group')
 param HostPoolResourceGroup string
 
+@sys.description('Required, Function App Name')
+param FunctionAppName string
+
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
 
@@ -120,20 +123,38 @@ resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing
   name: VmssName
 }
 
-resource functionApp 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
-  name: VmssName
-  scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroup}')
+resource getFunctionApp 'Microsoft.Web/sites@2023-01-01' existing = {
+  name: FunctionAppName
 }
 
-module RBACVmContributor '../../deploy/bicep/modules/RBACRoleAssignment.bicep' =  {
-  name: 'RBAC-VMContributor'
-  scope: subscription()
-  params: {
-    PrinicpalId: functionApp.identity.principalId
-    RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
-    Scope: vmssFlex.id
+// resource functionApp 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
+//   name: VmssName
+//   scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroup}')
+// }
+
+resource assignFunctionAppToVMSS 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(getFunctionApp.id,'9980e02c-c2be-4d73-94e8-173b1dc7cf3c', vmssFlex.id)
+  properties: {
+    //scope: vmssFlex.id
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')
+    principalId: getFunctionApp.identity.principalId
   }
+
+  dependsOn: [
+    getFunctionApp
+    vmssFlex
+  ]
 }
+
+// module RBACVmContributor '../../deploy/bicep/modules/RBACRoleAssignment.bicep' =  {
+//   name: 'RBAC-VMContributor'
+//   scope: subscription()
+//   params: {
+//     PrinicpalId: functionApp.identity.principalId
+//     RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
+//     Scope: vmssFlex.id
+//   }
+// }
 
 // module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
 //   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
@@ -293,7 +314,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     }
     dependsOn: [ 
       AddWVDHost 
-      RBACVmContributor
+      //RBACVmContributor
     ]
   }
   tags: Tags

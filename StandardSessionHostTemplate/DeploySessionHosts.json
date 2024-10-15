@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "17063193814007311111"
+      "templateHash": "18178878272492658007"
     }
   },
   "parameters": {
@@ -63,42 +63,6 @@
     "DomainJoinPassword": {
       "type": "securestring",
       "defaultValue": ""
-    },
-    "FslogixStorageName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, the storage account name for the FSLogix profile container"
-      }
-    },
-    "FslogixFileShareName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, the file share name for the FSLogix profile container"
-      }
-    },
-    "BaseScriptUri": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, the file for configuring the session host"
-      }
-    },
-    "VmssName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, the name of the virtual machine scale set"
-      }
-    },
-    "HostPoolResourceGroup": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, Host Pool Resource Group"
-      }
-    },
-    "FunctionAppName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, Function App Name"
-      }
     }
   },
   "resources": [
@@ -161,24 +125,6 @@
           "AvailabilityZones": {
             "value": "[parameters('AvailabilityZones')]"
           },
-          "BaseScriptUri": {
-            "value": "[parameters('BaseScriptUri')]"
-          },
-          "FslogixStorageName": {
-            "value": "[parameters('FslogixStorageName')]"
-          },
-          "FslogixFileShareName": {
-            "value": "[parameters('FslogixFileShareName')]"
-          },
-          "VmssName": {
-            "value": "[parameters('VmssName')]"
-          },
-          "HostPoolResourceGroup": {
-            "value": "[parameters('HostPoolResourceGroup')]"
-          },
-          "FunctionAppName": {
-            "value": "[parameters('FunctionAppName')]"
-          },
           "Tags": {
             "value": "[parameters('Tags')]"
           }
@@ -190,7 +136,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.30.23.60470",
-              "templateHash": "11791326580709735893"
+              "templateHash": "18423800479986568485"
             }
           },
           "parameters": {
@@ -250,87 +196,12 @@
             "DomainJoinPassword": {
               "type": "securestring",
               "defaultValue": ""
-            },
-            "AVDIdentityServiceProvider": {
-              "type": "string",
-              "defaultValue": "ADDS",
-              "metadata": {
-                "description": "Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)"
-              }
-            },
-            "FslogixStorageName": {
-              "type": "string",
-              "metadata": {
-                "description": "Required, the storage account name for the FSLogix profile container"
-              }
-            },
-            "FslogixFileShareName": {
-              "type": "string",
-              "metadata": {
-                "description": "Required, the file share name for the FSLogix profile container"
-              }
-            },
-            "BaseScriptUri": {
-              "type": "string",
-              "metadata": {
-                "description": "Required, the file for configuring the session host"
-              }
-            },
-            "VmssName": {
-              "type": "string",
-              "metadata": {
-                "description": "Required, the name of the virtual machine scale set"
-              }
-            },
-            "HostPoolResourceGroup": {
-              "type": "string",
-              "metadata": {
-                "description": "Required, Host Pool Resource Group"
-              }
-            },
-            "FunctionAppName": {
-              "type": "string",
-              "metadata": {
-                "description": "Required, Function App Name"
-              }
             }
           },
           "variables": {
             "varRequireNvidiaGPU": "[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
             "varVMNumber": "[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
-            "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]",
-            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration.ps1', parameters('BaseScriptUri'))]",
-            "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration.ps1",
-            "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
-            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
-            "fslogix": true,
-            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
-            "varAmdVmSizes": [
-              "Standard_NV4as_v4",
-              "Standard_NV8as_v4",
-              "Standard_NV16as_v4",
-              "Standard_NV32as_v4"
-            ],
-            "varAmdVmSize": "[contains(variables('varAmdVmSizes'), parameters('VMSize'))]",
-            "varNvidiaVmSizes": [
-              "Standard_NV6",
-              "Standard_NV12",
-              "Standard_NV24",
-              "Standard_NV12s_v3",
-              "Standard_NV24s_v3",
-              "Standard_NV48s_v3",
-              "Standard_NC4as_T4_v3",
-              "Standard_NC8as_T4_v3",
-              "Standard_NC16as_T4_v3",
-              "Standard_NC64as_T4_v3",
-              "Standard_NV6ads_A10_v5",
-              "Standard_NV12ads_A10_v5",
-              "Standard_NV18ads_A10_v5",
-              "Standard_NV36ads_A10_v5",
-              "Standard_NV36adms_A10_v5",
-              "Standard_NV72ads_A10_v5"
-            ],
-            "varNvidiaVmSize": "[contains(variables('varNvidiaVmSizes'), parameters('VMSize'))]"
+            "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]"
           },
           "resources": [
             {
@@ -473,15 +344,6 @@
               "tags": "[parameters('Tags')]"
             },
             {
-              "type": "Microsoft.Authorization/roleAssignments",
-              "apiVersion": "2022-04-01",
-              "name": "[guid(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '9980e02c-c2be-4d73-94e8-173b1dc7cf3c', resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName')))]",
-              "properties": {
-                "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')]",
-                "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId]"
-              }
-            },
-            {
               "type": "Microsoft.Compute/virtualMachines",
               "apiVersion": "2023-09-01",
               "name": "[parameters('VMName')]",
@@ -506,7 +368,7 @@
                       "storageAccountType": "[parameters('DiskType')]"
                     }
                   },
-                  "imageReference": "[parameters('ImageReference')]"
+                  "ImageReference": "[parameters('ImageReference')]"
                 },
                 "securityProfile": "[parameters('SecurityProfile')]",
                 "diagnosticsProfile": {
@@ -524,35 +386,11 @@
                     }
                   ]
                 },
-                "licenseType": "Windows_Client",
-                "virtualMachineScaleSet": {
-                  "id": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
-                }
+                "licenseType": "Windows_Client"
               },
               "tags": "[parameters('Tags')]",
               "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', format('{0}-vNIC', parameters('VMName')))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2023-09-01",
-              "name": "[format('{0}/{1}', parameters('VMName'), 'SH-Config')]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "publisher": "Microsoft.Compute",
-                "type": "CustomScriptExtension",
-                "typeHandlerVersion": "1.10",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                  "fileUris": "[array(variables('varSessionHostConfigurationScriptUri'))]"
-                },
-                "protectedSettings": {
-                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} {1}', variables('varSessionHostConfigurationScript'), variables('varScriptArguments'))]"
-                }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             }
           ]
