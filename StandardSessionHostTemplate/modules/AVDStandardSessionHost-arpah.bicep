@@ -123,28 +123,28 @@ resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing
   name: VmssName
 }
 
-resource getFunctionApp 'Microsoft.Web/sites@2023-01-01' existing = {
-  name: FunctionAppName
-}
+// resource getFunctionApp 'Microsoft.Web/sites@2023-01-01' existing = {
+//   name: FunctionAppName
+// }
 
 // resource functionApp 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
 //   name: VmssName
 //   scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroup}')
 // }
 
-resource assignFunctionAppToVMSS 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(getFunctionApp.id,'9980e02c-c2be-4d73-94e8-173b1dc7cf3c', vmssFlex.id)
-  properties: {
-    //scope: vmssFlex.id
-    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')
-    principalId: getFunctionApp.identity.principalId
-  }
+// resource assignFunctionAppToVMSS 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+//   name: guid(getFunctionApp.id,'9980e02c-c2be-4d73-94e8-173b1dc7cf3c', vmssFlex.id)
+//   properties: {
+//     //scope: vmssFlex.id
+//     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')
+//     principalId: getFunctionApp.identity.principalId
+//   }
 
-  dependsOn: [
-    getFunctionApp
-    vmssFlex
-  ]
-}
+//   dependsOn: [
+//     getFunctionApp
+//     vmssFlex
+//   ]
+// }
 
 // module RBACVmContributor '../../deploy/bicep/modules/RBACRoleAssignment.bicep' =  {
 //   name: 'RBAC-VMContributor'

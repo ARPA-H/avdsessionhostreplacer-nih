@@ -447,7 +447,7 @@ var varReplacementPlanSettings = [
 ]
 
 //var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
-var varFunctionAppName = 'AVDSessionHostReplacer-${AppPoolType}'
+var varFunctionAppName = 'AVDSessionHostReplacer-${AppPoolType}-2'
 
 var varFunctionAppIdentity = UseUserAssignedManagedIdentity
   ? {
