@@ -21,7 +21,7 @@ param (
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
 
-$TemplateName = "AVDSessionHostReplacer-$AppPoolType"
+$TemplateName = "AVDSHR-$AppPoolType"
 $Branch = 'deployment'
 
 $TemplateParameters = @{
