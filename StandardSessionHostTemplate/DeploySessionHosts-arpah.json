@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.30.23.60470",
-      "templateHash": "18239002796518854669"
+      "templateHash": "3521017038180227319"
     }
   },
   "parameters": {
@@ -86,18 +86,6 @@
       "type": "string",
       "metadata": {
         "description": "Required, the name of the virtual machine scale set"
-      }
-    },
-    "HostPoolResourceGroup": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, Host Pool Resource Group"
-      }
-    },
-    "FunctionAppName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, Function App Name"
       }
     }
   },
