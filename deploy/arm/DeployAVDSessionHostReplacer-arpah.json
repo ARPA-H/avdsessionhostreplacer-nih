@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.27.1.19265",
-      "templateHash": "837074257667402216"
+      "templateHash": "13308536745228008372"
     }
   },
   "parameters": {
@@ -444,7 +444,7 @@
     ],
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
-    "varFunctionAppName": "[format('AVDSessionHostReplacer-{0}', parameters('AppPoolType'))]",
+    "varFunctionAppName": "[format('AVDSHReplacer-{0}-2', parameters('AppPoolType'))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
   "resources": [
@@ -604,7 +604,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.27.1.19265",
-              "templateHash": "11692960074215570775"
+              "templateHash": "3192315988077717849"
             }
           },
           "parameters": {
@@ -668,6 +668,10 @@
               "defaultValue": {
                 "type": "SystemAssigned"
               }
+            },
+            "TimeStamp": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
             }
           },
           "variables": {
@@ -765,6 +769,66 @@
                 "[resourceId('Microsoft.Insights/components', variables('varAppServicePlanName'))]",
                 "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('RBAC-VMContributor-{0}', parameters('TimeStamp'))]",
+              "subscriptionId": "[subscription().subscriptionId]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "PrinicpalId": {
+                    "value": "[reference(resourceId('Microsoft.Web/sites', parameters('FunctionAppName')), '2023-01-01', 'full').identity.principalId]"
+                  },
+                  "RoleDefinitionId": {
+                    "value": "9980e02c-c2be-4d73-94e8-173b1dc7cf3c"
+                  },
+                  "Scope": {
+                    "value": "[subscription().id]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.27.1.19265",
+                      "templateHash": "15840473922521238774"
+                    }
+                  },
+                  "parameters": {
+                    "PrinicpalId": {
+                      "type": "string"
+                    },
+                    "RoleDefinitionId": {
+                      "type": "string"
+                    },
+                    "Scope": {
+                      "type": "string"
+                    }
+                  },
+                  "resources": [
+                    {
+                      "type": "Microsoft.Authorization/roleAssignments",
+                      "apiVersion": "2022-04-01",
+                      "name": "[guid(parameters('PrinicpalId'), parameters('RoleDefinitionId'), parameters('Scope'))]",
+                      "properties": {
+                        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', parameters('RoleDefinitionId'))]",
+                        "principalId": "[parameters('PrinicpalId')]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('FunctionAppName'))]"
               ]
             }
           ],
