@@ -46,11 +46,11 @@ param BaseScriptUri string
 @sys.description('Required, the name of the virtual machine scale set')
 param VmssName string
 
-@sys.description('Required, Host Pool Resource Group')
-param HostPoolResourceGroup string
+// @sys.description('Required, Host Pool Resource Group')
+// param HostPoolResourceGroup string
 
-@sys.description('Required, Function App Name')
-param FunctionAppName string
+// @sys.description('Required, Function App Name')
+// param FunctionAppName string
 
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
@@ -122,49 +122,6 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
 resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
   name: VmssName
 }
-
-// resource getFunctionApp 'Microsoft.Web/sites@2023-01-01' existing = {
-//   name: FunctionAppName
-// }
-
-// resource functionApp 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
-//   name: VmssName
-//   scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroup}')
-// }
-
-// resource assignFunctionAppToVMSS 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid(getFunctionApp.id,'9980e02c-c2be-4d73-94e8-173b1dc7cf3c', vmssFlex.id)
-//   properties: {
-//     //scope: vmssFlex.id
-//     roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', '9980e02c-c2be-4d73-94e8-173b1dc7cf3c')
-//     principalId: getFunctionApp.identity.principalId
-//   }
-
-//   dependsOn: [
-//     getFunctionApp
-//     vmssFlex
-//   ]
-// }
-
-// module RBACVmContributor '../../deploy/bicep/modules/RBACRoleAssignment.bicep' =  {
-//   name: 'RBAC-VMContributor'
-//   scope: subscription()
-//   params: {
-//     PrinicpalId: functionApp.identity.principalId
-//     RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
-//     Scope: vmssFlex.id
-//   }
-// }
-
-// module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
-//   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
-//   scope: subscription()
-//   params: {
-//     PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
-//     RoleDefinitionId: '392ae280-861d-42bd-9ea5-08ee6d83b80e' // Template Spec Reader
-//     Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
-//   }
-// }
 
 resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: VMName
@@ -317,8 +274,73 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       //RBACVmContributor
     ]
   }
+
+  resource AntiMalwareExtension 'extensions@2023-09-01' = {
+    name: 'MicrosoftAntiMalware'
+    //parent: virtualMachine
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Azure.Security'
+      type: 'IaaSAntimalware'
+      typeHandlerVersion: '1.3'
+      autoUpgradeMinorVersion: true
+      enableAutomaticUpgrade: false
+      settings: {
+          AntimalwareEnabled: true
+          RealtimeProtectionEnabled: 'true'
+          ScheduledScanSettings: {
+              isEnabled: 'true'
+              day: '7' // Day of the week for scheduled scan (1-Sunday, 2-Monday, ..., 7-Saturday)
+              time: '120' // When to perform the scheduled scan, measured in minutes from midnight (0-1440). For example: 0 = 12AM, 60 = 1AM, 120 = 2AM.
+              scanType: 'Quick' //Indicates whether scheduled scan setting type is set to Quick or Full (default is Quick)
+          }
+          Exclusions: {
+              Extensions: '*.vhd;*.vhdx'
+              Paths: '"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;${varFslogixSharePath}\\*\\*.VHD;${varFslogixSharePath}\\*\\*.VHDX'
+              Processes: '%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe'
+          }
+      }
+      // protectedSettings: !empty(protectedSettings) ? protectedSettings : null
+      // suppressFailures: supressFailures
+    }
+  }
+
   tags: Tags
 }
+
+// // Add antimalware extension to session host.
+// module sessionHostsAntimalwareExtension '../../../../avm/1.0.0/res/compute/virtual-machine/extension/main.bicep' = [for i in range(1, count): {
+//   scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
+//   name: 'SH-Antimal-${namePrefix}-${batchId}-${i - 1}-${time}'
+//   params: {
+//       location: location
+//       virtualMachineName: '${namePrefix}${padLeft((i + countIndex), 4, '0')}'
+//       name: 'MicrosoftAntiMalware'
+//       publisher: 'Microsoft.Azure.Security'
+//       type: 'IaaSAntimalware'
+//       typeHandlerVersion: '1.3'
+//       autoUpgradeMinorVersion: true
+//       enableAutomaticUpgrade: false
+//       settings: {
+//           AntimalwareEnabled: true
+//           RealtimeProtectionEnabled: 'true'
+//           ScheduledScanSettings: {
+//               isEnabled: 'true'
+//               day: '7' // Day of the week for scheduled scan (1-Sunday, 2-Monday, ..., 7-Saturday)
+//               time: '120' // When to perform the scheduled scan, measured in minutes from midnight (0-1440). For example: 0 = 12AM, 60 = 1AM, 120 = 2AM.
+//               scanType: 'Quick' //Indicates whether scheduled scan setting type is set to Quick or Full (default is Quick)
+//           }
+//           Exclusions: createAvdFslogixDeployment ? {
+//               Extensions: '*.vhd;*.vhdx'
+//               Paths: '"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;${fslogixSharePath}\\*\\*.VHD;${fslogixSharePath}\\*\\*.VHDX'
+//               Processes: '%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe'
+//           } : {}
+//       }
+//   }
+//   dependsOn: [
+//       sessionHosts
+//   ]
+// }]
 
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
   name:'SH-Config'

@@ -70,8 +70,8 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     FslogixStorageName: FslogixStorageName
     FslogixFileShareName: FslogixFileShareName
     VmssName: VmssName
-    HostPoolResourceGroup: HostPoolResourceGroup
-    FunctionAppName: FunctionAppName
+    // HostPoolResourceGroup: HostPoolResourceGroup
+    // FunctionAppName: FunctionAppName
     Tags: Tags
   }
 }]

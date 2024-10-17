@@ -301,8 +301,8 @@ var varSessionHostTemplateParameters = {
   FslogixStorageName: FslogixStorageName
   FslogixFileShareName: FslogixFileShareName
   VmssName: VmssName
-  HostPoolResourceGroup: HostPoolResourceGroupName
-  FunctionAppName: varFunctionAppName
+  // HostPoolResourceGroup: HostPoolResourceGroupName
+  // FunctionAppName: varFunctionAppName
   
   tags: {}
 }
