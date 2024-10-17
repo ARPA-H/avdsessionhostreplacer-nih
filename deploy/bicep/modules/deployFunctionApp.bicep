@@ -70,6 +70,8 @@ param FunctionAppIdentity object = {
   type: 'SystemAssigned'
 }
 
+param TimeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
+
 //-------//
 
 //------ Variables ------//
@@ -187,6 +189,16 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     properties: {
       packageUri: FunctionAppZipUrl
     }
+  }
+}
+
+module RoleAssignmentsVMContributor '../modules/RBACRoleAssignment.bicep' = {
+  name: 'RBAC-VMContributor-${TimeStamp}'
+  scope: subscription()
+  params: {
+    PrinicpalId: functionApp.identity.principalId
+    RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
+    Scope: subscription().id
   }
 }
 
