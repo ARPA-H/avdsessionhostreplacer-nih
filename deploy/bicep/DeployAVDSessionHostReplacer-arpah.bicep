@@ -2,6 +2,14 @@
 @description('Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group.')
 param Location string = resourceGroup().location
 
+@allowed([
+  'Dev' // Development
+  'Test' // Test
+  'Prod' // Production
+])
+@sys.description('The name of the resource group to deploy. (Default: Dev)')
+param DeploymentEnvironment string = 'Test'
+
 //Monitoring
 param EnableMonitoring bool = true
 param UseExistingLAW bool = false
@@ -447,7 +455,7 @@ var varReplacementPlanSettings = [
 ]
 
 //var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
-var varFunctionAppName = 'AVDSHReplacer-${AppPoolType}-2'
+var varFunctionAppName = 'AVDSHReplacer-${DeploymentEnvironment}-${AppPoolType}'
 
 var varFunctionAppIdentity = UseUserAssignedManagedIdentity
   ? {

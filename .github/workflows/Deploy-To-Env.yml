@@ -45,7 +45,8 @@ jobs:
              -FslogixStorageName 'stfslavdxtbiz' `
              -FslogixFileShareName 'fslogix-pc-app1-${{ github.event.inputs.environment }}-use2-001' `
              -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
-             -VMPostFix 'sd'
+             -VMPostFix 'sd' `
+             -DeploymentEnvironment '${{ github.event.inputs.environment }}'
             azPSVersion: "latest"
             errorActionPreference: stop
 
@@ -69,7 +70,8 @@ jobs:
               -FslogixStorageName 'stfslavdxtbiz' `
               -FslogixFileShareName 'fslogix-pc-remoteapps-${{ github.event.inputs.environment }}-use2-001' `
               -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
-              -VMPostFix 'ra'
+              -VMPostFix 'ra' `
+              -DeploymentEnvironment '${{ github.event.inputs.environment }}'
             azPSVersion: "latest"
             errorActionPreference: continue
             

@@ -15,7 +15,8 @@ param (
     [string]$FslogixStorageName,
     [string]$FslogixFileShareName,
     [string]$VmssName,
-    [string]$VMPostFix
+    [string]$VMPostFix,
+    [string]$DeploymentEnvironment
 
 )
 
@@ -58,7 +59,7 @@ $TemplateParameters = @{
     #SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
     SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
 
-    AcceleratedNetworking                        = $true # Make sure the size supports it
+    AcceleratedNetworking                        = $false # Make sure the size supports it
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
 
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
@@ -99,6 +100,7 @@ $TemplateParameters = @{
     ReplaceSessionHostOnNewImageVersionDelayDays = 0
     VMNamesTemplateParameterName                 = 'VMNames' # Do not change this unless using a custom Template to deploy
     SessionHostResourceGroupName                 = $SessionHostResourceGroupName # Leave empty if same as HostPoolResourceGroupName
+    DeploymentEnvironment                        = $DeploymentEnvironment
 }
 
 $paramNewAzResourceGroupDeployment = @{

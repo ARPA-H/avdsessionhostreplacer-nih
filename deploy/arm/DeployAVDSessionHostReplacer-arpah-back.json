@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.31.92.45157",
-      "templateHash": "14934473346083423411"
+      "version": "0.27.1.19265",
+      "templateHash": "2615907398303748615"
     }
   },
   "parameters": {
@@ -14,18 +14,6 @@
       "defaultValue": "[resourceGroup().location]",
       "metadata": {
         "description": "Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group."
-      }
-    },
-    "DeploymentEnvironment": {
-      "type": "string",
-      "defaultValue": "Test",
-      "allowedValues": [
-        "Dev",
-        "Test",
-        "Prod"
-      ],
-      "metadata": {
-        "description": "The name of the resource group to deploy. (Default: Dev)"
       }
     },
     "EnableMonitoring": {
@@ -454,7 +442,7 @@
     ],
     "varGraphEnvironmentNames": "[if(parameters('UseGovDodGraph'), createArray('Global', 'USGovDod', 'China'), createArray('Global', 'USGov', 'China'))]",
     "varGraphEnvironmentName": "[variables('varGraphEnvironmentNames')[indexOf(variables('varAzureEnvironments'), environment().name)]]",
-    "varFunctionAppName": "[format('AVDSHReplacer-{0}-{1}', parameters('DeploymentEnvironment'), parameters('AppPoolType'))]",
+    "varFunctionAppName": "[format('AVDSHReplacer-{0}-2', parameters('AppPoolType'))]",
     "varFunctionAppIdentity": "[if(parameters('UseUserAssignedManagedIdentity'), createObject('type', 'UserAssigned', 'userAssignedIdentities', createObject(format('{0}', parameters('UserAssignedManagedIdentityResourceId')), createObject())), createObject('type', 'SystemAssigned'))]"
   },
   "resources": [
@@ -613,8 +601,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "7853922308517460369"
+              "version": "0.27.1.19265",
+              "templateHash": "3192315988077717849"
             }
           },
           "parameters": {
@@ -670,7 +658,7 @@
             "ReplacementPlanSettings": {
               "type": "array",
               "metadata": {
-                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\n[\n  {\n    name: '_HostPoolResourceGroupName'\n    value: 'string'\n  }\n  {\n    name: '_HostPoolName'\n    value: 'string'\n  }\n  {\n    name: '_RemoveEntraDevice'\n    value: 'bool'\n  }\n  {\n    name: '_SessionHostTemplate'\n    value: 'string'\n  }\n  {\n    name: '_SessionHostParameters'\n    value: 'hashtable'\n  }\n  {\n    name: '_SubscriptionId'\n    value: 'string'\n  }\n  {\n    name: '_TargetSessionHostCount'\n    value: 'int'\n  }\n  {\n    name: '_SessionHostNamePrefix'\n    value: 'string'\n  }\n]"
+                "description": "Required: Yes | The following settings are mandatory. Rest are optional.\r\n[\r\n  {\r\n    name: '_HostPoolResourceGroupName'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_HostPoolName'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_RemoveEntraDevice'\r\n    value: 'bool'\r\n  }\r\n  {\r\n    name: '_SessionHostTemplate'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_SessionHostParameters'\r\n    value: 'hashtable'\r\n  }\r\n  {\r\n    name: '_SubscriptionId'\r\n    value: 'string'\r\n  }\r\n  {\r\n    name: '_TargetSessionHostCount'\r\n    value: 'int'\r\n  }\r\n  {\r\n    name: '_SessionHostNamePrefix'\r\n    value: 'string'\r\n  }\r\n]"
               }
             },
             "FunctionAppIdentity": {
@@ -809,8 +797,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.31.92.45157",
-                      "templateHash": "2127924129757676299"
+                      "version": "0.27.1.19265",
+                      "templateHash": "15840473922521238774"
                     }
                   },
                   "parameters": {
@@ -877,8 +865,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "8352303731969789919"
+              "version": "0.27.1.19265",
+              "templateHash": "2324522118177599406"
             }
           },
           "parameters": {
@@ -1509,8 +1497,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "2127924129757676299"
+              "version": "0.27.1.19265",
+              "templateHash": "15840473922521238774"
             }
           },
           "parameters": {
@@ -1570,8 +1558,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "2127924129757676299"
+              "version": "0.27.1.19265",
+              "templateHash": "15840473922521238774"
             }
           },
           "parameters": {
