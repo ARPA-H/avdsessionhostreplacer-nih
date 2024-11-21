@@ -55,7 +55,7 @@ $TemplateParameters = @{
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'eastus2' # Does not have to be the same as Host Pool
     #AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
-    AvailabilityZones                            = @() # Set to empty array if not using AZs
+    AvailabilityZones                            = @("1") # Set to empty array if not using AZs
     #SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
     SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
 
