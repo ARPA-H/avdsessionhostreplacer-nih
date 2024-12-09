@@ -16,7 +16,8 @@ param (
     [string]$FslogixFileShareName,
     [string]$VmssName,
     [string]$VMPostFix,
-    [string]$DeploymentEnvironment
+    [string]$DeploymentEnvironment,
+    [int]$TargetSessionHostCount
 
 )
 
@@ -42,7 +43,7 @@ $TemplateParameters = @{
     HostPoolResourceGroupName                    = $ResourceGroupName
     #SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
     SessionHostNamePrefix                        = "arpahavd$VMPostFix" # Will be appended by '-XX'
-    TargetSessionHostCount                       = 4 # How many session hosts to maintain in the Host Pool
+    TargetSessionHostCount                       = $TargetSessionHostCount # How many session hosts to maintain in the Host Pool
     TargetSessionHostBuffer                      = 1 # The maximum number of session hosts to add during a replacement process
     IncludePreExistingSessionHosts               = $false # Include existing session hosts in automation
 
@@ -56,8 +57,8 @@ $TemplateParameters = @{
     SessionHostsRegion                           = 'eastus2' # Does not have to be the same as Host Pool
     #AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
     AvailabilityZones                            = @("1") # Set to empty array if not using AZs
-    #SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
-    SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
+    SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
+    #SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
 
     AcceleratedNetworking                        = $false # Make sure the size supports it
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
