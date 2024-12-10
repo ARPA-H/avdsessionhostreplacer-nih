@@ -64,7 +64,7 @@ $TemplateParameters = @{
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
 
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
-    MarketPlaceImage                             = 'win11-23h2-avd-m365'
+    MarketPlaceImage                             = 'win11-24h2-avd-m365'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
     GalleryImageId = '/subscriptions/87a23dae-87b7-4372-b94f-92e72de0705e/resourceGroups/rg-avd-golden-image/providers/Microsoft.Compute/galleries/acgavd/images/GoldenImageAVDArpaH' # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
 
