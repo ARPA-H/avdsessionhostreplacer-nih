@@ -50,7 +50,7 @@ jobs:
              -KeyVaultName '${{ secrets.AVD_KEY_VAULT }}' `
              -AppPoolType 'SessionDesktop' `
              -BaseScriptUri 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/deployment/workload/' `
-             -FslogixStorageName 'stfslavdxtbiz' `
+             -FslogixStorageName ''${{ secrets.SESSION_HOST_STORAGE }}' `
              -FslogixFileShareName 'fslogix-pc-app1-${{ github.event.inputs.environment }}-use2-001' `
              -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
              -VMPostFix 'sd' `
@@ -76,7 +76,7 @@ jobs:
               -KeyVaultName '${{ secrets.AVD_KEY_VAULT }}' `
               -AppPoolType 'RemoteApp' `
               -BaseScriptUri 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/deployment/workload/' `
-              -FslogixStorageName 'stfslavdxpra' `
+              -FslogixStorageName '${{ secrets.RA_STORAGE }}' `
               -FslogixFileShareName 'fslogix-pc-remoteapps-${{ github.event.inputs.environment }}-use2-001' `
               -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
               -VMPostFix 'ra' `
