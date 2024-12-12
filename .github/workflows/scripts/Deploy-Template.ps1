@@ -17,14 +17,16 @@ param (
     [string]$VmssName,
     [string]$VMPostFix,
     [string]$DeploymentEnvironment,
-    [int]$TargetSessionHostCount
+    [int]$TargetSessionHostCount,
+    [string]$Branch,
+    [string]$GalleryImageId
 
 )
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
 
 $TemplateName = "AVDSHR-$AppPoolType"
-$Branch = 'deployment'
+#$Branch = 'main'
 
 $TemplateParameters = @{
     EnableMonitoring                             = $true

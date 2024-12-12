@@ -23,6 +23,10 @@ jobs:
     name: Deploy to ${{ github.event.inputs.environment }} environment
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+      GALLERY_IMAGE_ID: ${{ secrets.GALLERY_IMAGE_ID }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -55,7 +59,9 @@ jobs:
              -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
              -VMPostFix 'sd' `
              -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
-             -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }}
+             -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
+             -Branch $BRANCH_NAME `
+             -GalleryImageId '$GALLERY_IMAGE_ID'
             azPSVersion: "latest"
             errorActionPreference: stop
 
@@ -81,7 +87,9 @@ jobs:
               -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
               -VMPostFix 'ra' `
               -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
-              -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }}
+              -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }} `
+              -Branch $BRANCH_NAME `
+              -GalleryImageId '$GALLERY_IMAGE_ID'
             azPSVersion: "latest"
             errorActionPreference: continue
             
