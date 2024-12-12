@@ -2,6 +2,14 @@
 @description('Required: No | Region of the Function App. This does not need to be the same as the location of the Azure Virtual Desktop Host Pool. | Default: Location of the resource group.')
 param Location string = resourceGroup().location
 
+@allowed([
+  'Dev' // Development
+  'Test' // Test
+  'Prod' // Production
+])
+@sys.description('The name of the resource group to deploy. (Default: Dev)')
+param DeploymentEnvironment string = 'Test'
+
 //Monitoring
 param EnableMonitoring bool = true
 param UseExistingLAW bool = false
@@ -39,6 +47,7 @@ param MarketPlaceOrCustomImage string
   'win11-21h2-avd-m365'
   'win11-23h2-avd'
   'win11-23h2-avd-m365'
+  'win11-24h2-avd-m365'
   'win11-22h2-avd'
   '2022-datacenter-g2'
   'win10-22h2-avd-g2'
@@ -145,6 +154,27 @@ param SessionHostResourceGroupName string = ''
 
 param TimeStamp string = utcNow() // Used for unique deployment names. Do Not supply a value for this parameter.
 
+@description('Existing key vault name to use for retrieving domain join password.')
+param KeyVaultName string = ''
+
+@allowed([
+  'SessionDesktop'
+  'RemoteApp'
+])
+@description('SessionDesktop or RemoteApp')
+param AppPoolType string = 'SessionDesktop'
+
+@sys.description('Required, the storage account name for the FSLogix profile container')
+param FslogixStorageName string
+
+@sys.description('Required, the file share name for the FSLogix profile container')
+param FslogixFileShareName string
+
+@sys.description('Required, the file for configuring the session host')
+param BaseScriptUri string
+
+@sys.description('Required, the name of the virtual machine scale set')
+param VmssName string
 /////////////////
 
 //---- Variables ----//
@@ -258,11 +288,12 @@ var varDomainJoinPasswordReference = IdentityServiceProvider == 'EntraID'
   : {
       reference: {
         keyVault: {
-          id: deployKeyVault.outputs.keyVaultId
+          id: deployKeyVault.id
         }
-        secretName: 'DomainJoinPassword'
+        secretName: 'domainJoinUserPassword'
       }
     }
+
 var varSessionHostTemplateParameters = {
   Location: SessionHostsRegion
   AvailabilityZones: AvailabilityZones
@@ -275,6 +306,13 @@ var varSessionHostTemplateParameters = {
   DomainJoinObject: varDomainJoinObject
   DomainJoinPassword: varDomainJoinPasswordReference
   AdminUsername: LocalAdminUsername
+  BaseScriptUri: BaseScriptUri
+  FslogixStorageName: FslogixStorageName
+  FslogixFileShareName: FslogixFileShareName
+  VmssName: VmssName
+  // HostPoolResourceGroup: HostPoolResourceGroupName
+  // FunctionAppName: varFunctionAppName
+  
   tags: {}
 }
 // This variable calculates the Entra Environment Name based on the Azure Environment Name in environment()
@@ -417,10 +455,8 @@ var varReplacementPlanSettings = [
   }
 ]
 
-//var varUniqueString = uniqueString(resourceGroup().id, HostPoolName)
-var varUniqueString = uniqueString(resourceGroup().id, TimeStamp)
-
-var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
+//var varFunctionAppName = 'AVDSessionHostReplacer-${uniqueString(resourceGroup().id, HostPoolName)}'
+var varFunctionAppName = 'AVDSHReplacer-${DeploymentEnvironment}-${AppPoolType}'
 
 var varFunctionAppIdentity = UseUserAssignedManagedIdentity
   ? {
@@ -458,13 +494,18 @@ module deployFunctionApp 'modules/deployFunctionApp.bicep' = {
   }
 }
 
-module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvider != 'EntraID') {
-  name: 'deployKeyVault'
-  params: {
-    Location: Location
-    KeyVaultName: 'kvavdsh-${varUniqueString}'
-    DomainJoinPassword: ADJoinUserPassword
-  }
+// module deployKeyVault 'modules/deployKeyVault.bicep' = if (IdentityServiceProvider != 'EntraID') {
+//   name: 'deployKeyVault'
+//   params: {
+//     Location: Location
+//     KeyVaultName: 'kvavdsh-${varUniqueString}'
+//     DomainJoinPassword: ADJoinUserPassword
+//   }
+// }
+
+resource deployKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: KeyVaultName
+  scope: resourceGroup('${subscription().subscriptionId}', '${HostPoolResourceGroupName}')
 }
 
 module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec-arpah.bicep' = {
@@ -500,7 +541,24 @@ module RoleAssignmentsVdiVMContributor 'modules/RBACRoleAssignment.bicep' = if (
     RoleDefinitionId: 'a959dbd1-f747-45e3-8ba6-dd80f235f97c' // Desktop Virtualization Virtual Machine Contributor
     Scope: subscription().id
   }
+  dependsOn: [
+    deployFunctionApp
+  ]
 }
+
+// module RoleAssignmentsVMContributor 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
+//   name: 'RBAC-VMContributor-${TimeStamp}'
+//   scope: subscription()
+//   params: {
+//     PrinicpalId: deployFunctionApp.outputs.functionAppPrincipalId
+//     RoleDefinitionId: '9980e02c-c2be-4d73-94e8-173b1dc7cf3c' // Virtual Machine Contributor
+//     Scope: subscription().id
+//   }
+//   dependsOn: [
+//     deployFunctionApp
+//   ]
+// }
+
 module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssignedManagedIdentity) {
   name: 'RBAC-TemplateSpecReader-${TimeStamp}'
   scope: subscription()
@@ -510,3 +568,6 @@ module RBACTemplateSpec 'modules/RBACRoleAssignment.bicep' = if (!UseUserAssigne
     Scope: deployStandardSessionHostTemplate.outputs.TemplateSpecResourceId
   }
 }
+
+
+

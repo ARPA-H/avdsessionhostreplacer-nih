@@ -8,22 +8,42 @@ param (
     [string]$ResourceGroupName,
     [string]$SessionHostResourceGroupName,
     [string]$HostPoolName,
-    [string]$LocalAdminUserName
+    [string]$LocalAdminUserName,
+    [string]$KeyVaultName,
+    [string]$AppPoolType,
+    [string]$BaseScriptUri,
+    [string]$FslogixStorageName,
+    [string]$FslogixFileShareName,
+    [string]$VmssName,
+    [string]$VMPostFix,
+    [string]$DeploymentEnvironment,
+    [int]$TargetSessionHostCount
+
 )
 
 #$ResourceGroupName = '' # Same as the Host Pool RG
+
+$TemplateName = "AVDSHR-$AppPoolType"
+$Branch = 'deployment'
 
 $TemplateParameters = @{
     EnableMonitoring                             = $true
     UseExistingLAW                               = $true
     LogAnalyticsWorkspaceId = $LogAnalyticsWorkspaceId # Only required if UseExistingLAW is $true. Use ResourceID
 
+    KeyVaultName = $KeyVaultName
+    AppPoolType = $AppPoolType # 'SessionDesktop' or 'RemoteApp'
+    BaseScriptUri = $BaseScriptUri
+    FslogixStorageName = $FslogixStorageName
+    FslogixFileShareName = $FslogixFileShareName
+    VmssName = $VmssName
+    
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName
     HostPoolResourceGroupName                    = $ResourceGroupName
     #SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
-    SessionHostNamePrefix                        = 'arpahavdn' # Will be appended by '-XX'
-    TargetSessionHostCount                       = 2 # How many session hosts to maintain in the Host Pool
+    SessionHostNamePrefix                        = "arpahavd$VMPostFix" # Will be appended by '-XX'
+    TargetSessionHostCount                       = $TargetSessionHostCount # How many session hosts to maintain in the Host Pool
     TargetSessionHostBuffer                      = 1 # The maximum number of session hosts to add during a replacement process
     IncludePreExistingSessionHosts               = $false # Include existing session hosts in automation
 
@@ -35,17 +55,18 @@ $TemplateParameters = @{
 
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'eastus2' # Does not have to be the same as Host Pool
-    AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
-    #SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
-    SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
+    #AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
+    AvailabilityZones                            = @("1") # Set to empty array if not using AZs
+    SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
+    #SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
 
-    AcceleratedNetworking                        = $true # Make sure the size supports it
+    AcceleratedNetworking                        = $false # Make sure the size supports it
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
 
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
-    MarketPlaceImage                             = 'win11-23h2-avd-m365'
+    MarketPlaceImage                             = 'win11-24h2-avd-m365'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
-    GalleryImageId = '/subscriptions/87a23dae-87b7-4372-b94f-92e72de0705e/resourceGroups/rg-avd-golden-image/providers/Microsoft.Compute/galleries/acgavd/images/GoldenImageAVDArpaH/versions/1.0.0' # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
+    GalleryImageId = '/subscriptions/87a23dae-87b7-4372-b94f-92e72de0705e/resourceGroups/rg-avd-golden-image/providers/Microsoft.Compute/galleries/acgavd/images/GoldenImageAVDArpaH' # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
 
     SecurityType                                 = 'TrustedLaunch' # Standard, TrustedLaunch, or ConfidentialVM
     SecureBootEnabled                            = $true
@@ -80,10 +101,12 @@ $TemplateParameters = @{
     ReplaceSessionHostOnNewImageVersionDelayDays = 0
     VMNamesTemplateParameterName                 = 'VMNames' # Do not change this unless using a custom Template to deploy
     SessionHostResourceGroupName                 = $SessionHostResourceGroupName # Leave empty if same as HostPoolResourceGroupName
+    DeploymentEnvironment                        = $DeploymentEnvironment
 }
 
 $paramNewAzResourceGroupDeployment = @{
-    Name = 'AVDSessionHostReplacer'
+    #Name = 'AVDSessionHostReplacer'
+    Name = $TemplateName
     ResourceGroupName = $ResourceGroupName
     #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.0.1-beta.0/deploy/arm/DeployAVDSessionHostReplacer.json'
     #TemplateUri = 'https://github.com/ARPA-H/avdsessionhostreplacer-nih/blob/main/deploy/arm/DeployAVDSessionHostReplacer.json'
@@ -92,7 +115,8 @@ $paramNewAzResourceGroupDeployment = @{
     #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.3.1-beta.1/deploy/arm/DeployAVDSessionHostReplacer.json'
 
     # arpa-h template
-    TemplateUri = 'https://raw.githubusercontent.com/ARPA-H/avdsessionhostreplacer-nih/main/deploy/arm/DeployAVDSessionHostReplacer-arpah.json'
+    TemplateUri = "https://raw.githubusercontent.com/ARPA-H/avdsessionhostreplacer-nih/$Branch/deploy/arm/DeployAVDSessionHostReplacer-arpah.json"
+    #TemplateUri = 'https://raw.githubusercontent.com/ARPA-H/avdsessionhostreplacer-nih/main/deploy/arm/DeployAVDSessionHostReplacer-arpah.json'
 
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer-arpah.bicep'

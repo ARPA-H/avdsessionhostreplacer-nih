@@ -30,17 +30,27 @@ param DomainJoinObject object = {}
 @secure()
 param DomainJoinPassword string = ''
 
-// @sys.description('Do not modify, used to set unique value for resource deployment.')
-// param Time string = utcNow()
-
+// params for ARPA-H
 @sys.description('Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)')
-param avdIdentityServiceProvider string = 'ADDS'
+param AVDIdentityServiceProvider string = 'ADDS'
 
 @sys.description('Required, the storage account name for the FSLogix profile container')
-param varFslogixStorageName string = 'stfslavdxtbiz'
+param FslogixStorageName string
 
 @sys.description('Required, the file share name for the FSLogix profile container')
-param varFslogixFileShareName string = 'fslogix-pc-app1-test-use2-001'
+param FslogixFileShareName string
+
+@sys.description('Required, the file for configuring the session host')
+param BaseScriptUri string
+
+@sys.description('Required, the name of the virtual machine scale set')
+param VmssName string
+
+// @sys.description('Required, Host Pool Resource Group')
+// param HostPoolResourceGroup string
+
+// @sys.description('Required, Function App Name')
+// param FunctionAppName string
 
 //---- Variables ----//
 var varRequireNvidiaGPU = startsWith(VMSize, 'Standard_NC') || contains(VMSize, '_A10_v5')
@@ -55,22 +65,13 @@ var varVMNumber = int(
 
 var varAvailabilityZone = AvailabilityZones == [] ? [] : [ '${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}' ]
 
-
-var varBaseScriptUri = 'https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/main/workload/'
-var varSessionHostConfigurationScriptUri = '${varBaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
+var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
 var varSessionHostConfigurationScript = './Set-SessionHostConfiguration.ps1'
-
-@sys.description('Required, the path to the FSLogix profile container')
-var varFslogixSharePath = '\\\\${varFslogixStorageName}.file.${environment().suffixes.storage}\\${varFslogixFileShareName}' 
-
-@sys.description('Required, the FQDN of the storage account for the FSLogix profile container')
-var varFslogixStorageFqdn = '${varFslogixStorageName}.file.${environment().suffixes.storage}'
-
+var varFslogixSharePath = '\\\\${FslogixStorageName}.file.${environment().suffixes.storage}\\${FslogixFileShareName}' 
+var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
 var fslogix = true
-var identityDomainName = 'nih.gov'
-//var identityServiceProvider = 'ADDS'
 
-var varScriptArguments = '-IdentityDomainName ${identityDomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${avdIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
 var varAmdVmSizes = [
   'Standard_NV4as_v4'
   'Standard_NV8as_v4'
@@ -98,7 +99,6 @@ var varNvidiaVmSizes = [
 ]
 var varNvidiaVmSize = contains(varNvidiaVmSizes, VMSize)
 
-
 resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   name: '${VMName}-vNIC'
   location: Location
@@ -116,6 +116,11 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
     enableAcceleratedNetworking: AcceleratedNetworking
   }
   tags: Tags
+}
+
+// get existing vm ss
+resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
+  name: VmssName
 }
 
 resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
@@ -160,7 +165,9 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       ]
     }
     licenseType: 'Windows_Client'
-
+    virtualMachineScaleSet:{
+      id: vmssFlex.id
+    }
   }
   // Guest Attestation (Integrity Monitoring) //
   resource deployIntegrityMonitoring 'extensions@2023-09-01' = {
@@ -200,132 +207,143 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     dependsOn: [ deployIntegrityMonitoring ]
   }
 
-  // module vmss_azureMonitorAgentExtension 'extension/main.bicep' =
-  // if (extensionMonitoringAgentConfig.enabled) {
-  //   name: '${uniqueString(deployment().name, location)}-VMSS-AzureMonitorAgent'
-  //   params: {
-  //     virtualMachineScaleSetName: vmss.name
-  //     name: 'AzureMonitorAgent'
-  //     publisher: 'Microsoft.Azure.Monitor'
-  //     type: osType == 'Windows' ? 'AzureMonitorWindowsAgent' : 'AzureMonitorLinuxAgent'
-  //     typeHandlerVersion: contains(extensionMonitoringAgentConfig, 'typeHandlerVersion')
-  //       ? extensionMonitoringAgentConfig.typeHandlerVersion
-  //       : (osType == 'Windows' ? '1.22' : '1.29')
-  //     autoUpgradeMinorVersion: contains(extensionMonitoringAgentConfig, 'autoUpgradeMinorVersion')
-  //       ? extensionMonitoringAgentConfig.autoUpgradeMinorVersion
-  //       : true
-  //     enableAutomaticUpgrade: contains(extensionMonitoringAgentConfig, 'enableAutomaticUpgrade')
-  //       ? extensionMonitoringAgentConfig.enableAutomaticUpgrade
-  //       : false
-  //     settings: {
-  //       workspaceId: !empty(monitoringWorkspaceId)
-  //         ? reference(vmss_logAnalyticsWorkspace.id, vmss_logAnalyticsWorkspace.apiVersion).customerId
-  //         : ''
-  //       GCS_AUTO_CONFIG: osType == 'Linux' ? true : null
-  //     }
-  //     protectedSettings: {
-  //       workspaceKey: !empty(monitoringWorkspaceId) ? vmss_logAnalyticsWorkspace.listKeys().primarySharedKey : ''
-  //     }
-  //   }
-  //   dependsOn: [
-  //     vmss_microsoftAntiMalwareExtension
-  //   ]
-  // }
-
-// HostPool join 
-resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
-  // Documentation is available here: https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-template
-  // TODO: Update to the new format for DSC extension, see documentation above.
-  name: 'JoinHostPool'
-  location: Location
-  properties: {
-    publisher: 'Microsoft.PowerShell'
-    type: 'DSC'
-    typeHandlerVersion: '2.77'
-    autoUpgradeMinorVersion: true
-    settings: {
-      modulesUrl: WVDArtifactsURL
-      configurationFunction: 'Configuration.ps1\\AddSessionHost'
-      properties: {
-        hostPoolName: HostPoolName
-        registrationInfoToken: HostPoolToken
-        aadJoin: DomainJoinObject.DomainType == 'EntraID' ? true : false
-        useAgentDownloadEndpoint: true
-        mdmId: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? '0000000a-0000-0000-c000-000000000000' : '') : ''
+  // HostPool join 
+  resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
+    // Documentation is available here: https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-template
+    // TODO: Update to the new format for DSC extension, see documentation above.
+    name: 'JoinHostPool'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.PowerShell'
+      type: 'DSC'
+      typeHandlerVersion: '2.77'
+      autoUpgradeMinorVersion: true
+      settings: {
+        modulesUrl: WVDArtifactsURL
+        configurationFunction: 'Configuration.ps1\\AddSessionHost'
+        properties: {
+          hostPoolName: HostPoolName
+          registrationInfoToken: HostPoolToken
+          aadJoin: DomainJoinObject.DomainType == 'EntraID' ? true : false
+          useAgentDownloadEndpoint: true
+          mdmId: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? '0000000a-0000-0000-c000-000000000000' : '') : ''
+        }
       }
     }
+    dependsOn: [ deployGPUDriversNvidia ]
   }
-  dependsOn: [ deployGPUDriversNvidia ]
-}
   
-// Domain Join //
-resource AADJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'EntraID') {
-  name: 'AADLoginForWindows'
-  location: Location
-  properties: {
-    publisher: 'Microsoft.Azure.ActiveDirectory'
-    type: 'AADLoginForWindows'
-    typeHandlerVersion: '2.0'
-    autoUpgradeMinorVersion: true
-    settings: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? { mdmId: '0000000a-0000-0000-c000-000000000000' } : null) : null
-  }
-  dependsOn: [ AddWVDHost ]
-}
-
-resource DomainJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'ActiveDirectory') {
-  // Documentation is available here: https://docs.microsoft.com/en-us/azure/active-directory-domain-services/join-windows-vm-template#azure-resource-manager-template-overview
-  name: 'DomainJoin'
-  location: Location
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'JSonADDomainExtension'
-    typeHandlerVersion: '1.3'
-    autoUpgradeMinorVersion: true
-    settings: {
-      Name: DomainJoinObject.DomainName
-      OUPath: DomainJoinObject.ADOUPath
-      User: '${DomainJoinObject.DomainName}\\${DomainJoinObject.DomainJoinUserName}'
-      Restart: 'true'
-
-      //will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx'
-      Options: 3
+  // Domain Join //
+  resource AADJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'EntraID') {
+    name: 'AADLoginForWindows'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Azure.ActiveDirectory'
+      type: 'AADLoginForWindows'
+      typeHandlerVersion: '2.0'
+      autoUpgradeMinorVersion: true
+      settings: contains(DomainJoinObject, 'IntuneJoin') ? (DomainJoinObject.IntuneJoin ? { mdmId: '0000000a-0000-0000-c000-000000000000' } : null) : null
     }
-    protectedSettings: {
-      Password: DomainJoinPassword //TODO: Test domain join from keyvault option
+    dependsOn: [ AddWVDHost ]
+  }
+
+  resource DomainJoin 'extensions@2023-09-01' = if (DomainJoinObject.DomainType == 'ActiveDirectory') {
+    // Documentation is available here: https://docs.microsoft.com/en-us/azure/active-directory-domain-services/join-windows-vm-template#azure-resource-manager-template-overview
+    name: 'DomainJoin'
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Compute'
+      type: 'JSonADDomainExtension'
+      typeHandlerVersion: '1.3'
+      autoUpgradeMinorVersion: true
+      settings: {
+        Name: DomainJoinObject.DomainName
+        OUPath: DomainJoinObject.ADOUPath
+        User: '${DomainJoinObject.DomainName}\\${DomainJoinObject.DomainJoinUserName}'
+        Restart: 'true'
+
+        //will join the domain and create the account on the domain. For more information see https://msdn.microsoft.com/en-us/library/aa392154(v=vs.85).aspx'
+        Options: 3
+      }
+      protectedSettings: {
+        Password: DomainJoinPassword //TODO: Test domain join from keyvault option
+      }
+    }
+    dependsOn: [ 
+      AddWVDHost 
+      //RBACVmContributor
+    ]
+  }
+
+  resource AntiMalwareExtension 'extensions@2023-09-01' = {
+    name: 'MicrosoftAntiMalware'
+    //parent: virtualMachine
+    location: Location
+    properties: {
+      publisher: 'Microsoft.Azure.Security'
+      type: 'IaaSAntimalware'
+      typeHandlerVersion: '1.3'
+      autoUpgradeMinorVersion: true
+      enableAutomaticUpgrade: false
+      settings: {
+          AntimalwareEnabled: true
+          RealtimeProtectionEnabled: 'true'
+          ScheduledScanSettings: {
+              isEnabled: 'true'
+              day: '7' // Day of the week for scheduled scan (1-Sunday, 2-Monday, ..., 7-Saturday)
+              time: '120' // When to perform the scheduled scan, measured in minutes from midnight (0-1440). For example: 0 = 12AM, 60 = 1AM, 120 = 2AM.
+              scanType: 'Quick' //Indicates whether scheduled scan setting type is set to Quick or Full (default is Quick)
+          }
+          Exclusions: {
+              Extensions: '*.vhd;*.vhdx'
+              Paths: '"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;${varFslogixSharePath}\\*\\*.VHD;${varFslogixSharePath}\\*\\*.VHDX'
+              Processes: '%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe'
+          }
+      }
+      // protectedSettings: !empty(protectedSettings) ? protectedSettings : null
+      // suppressFailures: supressFailures
     }
   }
-  dependsOn: [ AddWVDHost ]
-}
-tags: Tags
+
+  tags: Tags
 }
 
-// Apply AVD session host configurations
-// module sessionHostConfiguration '.bicep/configureSessionHost.bicep' = {
-//   //scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
-//   name: 'SH-Config'
+// // Add antimalware extension to session host.
+// module sessionHostsAntimalwareExtension '../../../../avm/1.0.0/res/compute/virtual-machine/extension/main.bicep' = [for i in range(1, count): {
+//   scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
+//   name: 'SH-Antimal-${namePrefix}-${batchId}-${i - 1}-${time}'
 //   params: {
-//       location: Location
-//       name: 'sessionHostConfiguration'
-//       hostPoolToken: HostPoolToken
-//       baseScriptUri: varSessionHostConfigurationScriptUri
-//       scriptName: varSessionHostConfigurationScript
-//       fslogix: true
-//       identityDomainName: 'nih.gov'
-//       vmSize: VMSize
-//       fslogixFileShare: varFslogixSharePath
-//       fslogixStorageFqdn: varFslogixStorageFqdn
-//       identityServiceProvider: avdIdentityServiceProvider
+//       location: location
+//       virtualMachineName: '${namePrefix}${padLeft((i + countIndex), 4, '0')}'
+//       name: 'MicrosoftAntiMalware'
+//       publisher: 'Microsoft.Azure.Security'
+//       type: 'IaaSAntimalware'
+//       typeHandlerVersion: '1.3'
+//       autoUpgradeMinorVersion: true
+//       enableAutomaticUpgrade: false
+//       settings: {
+//           AntimalwareEnabled: true
+//           RealtimeProtectionEnabled: 'true'
+//           ScheduledScanSettings: {
+//               isEnabled: 'true'
+//               day: '7' // Day of the week for scheduled scan (1-Sunday, 2-Monday, ..., 7-Saturday)
+//               time: '120' // When to perform the scheduled scan, measured in minutes from midnight (0-1440). For example: 0 = 12AM, 60 = 1AM, 120 = 2AM.
+//               scanType: 'Quick' //Indicates whether scheduled scan setting type is set to Quick or Full (default is Quick)
+//           }
+//           Exclusions: createAvdFslogixDeployment ? {
+//               Extensions: '*.vhd;*.vhdx'
+//               Paths: '"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;${fslogixSharePath}\\*\\*.VHD;${fslogixSharePath}\\*\\*.VHDX'
+//               Processes: '%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe'
+//           } : {}
+//       }
 //   }
-//   dependsOn: [ 
-//     VM 
+//   dependsOn: [
+//       sessionHosts
 //   ]
-// }
-
-
+// }]
 
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
-  //name: 'SH-Config/${VMName}'
-  name: 'SH-Config'
+  name:'SH-Config'
   location: Location
   parent: VM
   properties: {
@@ -341,25 +359,3 @@ resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09
     }
   }
 }
-
-// module sessionHostConfigurationTest '.bicep/configureSessionHost.bicep' = [for i in range(1, count): {
-//   scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
-//   name: 'SH-Config-${batchId}-${i}-${time}'
-//   params: {
-//       location: location
-//       name: '${namePrefix}${padLeft((i + countIndex), 4, '0')}'
-//       hostPoolToken: keyVault.getSecret('hostPoolRegistrationToken')
-//       baseScriptUri: sessionHostConfigurationScriptUri
-//       scriptName: sessionHostConfigurationScript
-//       fslogix: createAvdFslogixDeployment
-//       identityDomainName: identityDomainName
-//       vmSize: vmSize
-//       fslogixFileShare: fslogixSharePath
-//       fslogixStorageFqdn: fslogixStorageFqdn
-//       identityServiceProvider: identityServiceProvider
-//   }
-//   dependsOn: [
-//       sessionHosts
-//       monitoring
-//   ]
-// }]

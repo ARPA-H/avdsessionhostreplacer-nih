@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.29.47.4906",
-      "templateHash": "16605071579164448535"
+      "version": "0.30.23.60470",
+      "templateHash": "3521017038180227319"
     }
   },
   "parameters": {
@@ -63,6 +63,30 @@
     "DomainJoinPassword": {
       "type": "securestring",
       "defaultValue": ""
+    },
+    "FslogixStorageName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the storage account name for the FSLogix profile container"
+      }
+    },
+    "FslogixFileShareName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the file share name for the FSLogix profile container"
+      }
+    },
+    "BaseScriptUri": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the file for configuring the session host"
+      }
+    },
+    "VmssName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the name of the virtual machine scale set"
+      }
     }
   },
   "resources": [
@@ -125,6 +149,18 @@
           "AvailabilityZones": {
             "value": "[parameters('AvailabilityZones')]"
           },
+          "BaseScriptUri": {
+            "value": "[parameters('BaseScriptUri')]"
+          },
+          "FslogixStorageName": {
+            "value": "[parameters('FslogixStorageName')]"
+          },
+          "FslogixFileShareName": {
+            "value": "[parameters('FslogixFileShareName')]"
+          },
+          "VmssName": {
+            "value": "[parameters('VmssName')]"
+          },
           "Tags": {
             "value": "[parameters('Tags')]"
           }
@@ -135,8 +171,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.29.47.4906",
-              "templateHash": "2200622810536620973"
+              "version": "0.30.23.60470",
+              "templateHash": "11842139683107399331"
             }
           },
           "parameters": {
@@ -197,25 +233,35 @@
               "type": "securestring",
               "defaultValue": ""
             },
-            "avdIdentityServiceProvider": {
+            "AVDIdentityServiceProvider": {
               "type": "string",
               "defaultValue": "ADDS",
               "metadata": {
                 "description": "Required, The service providing domain services for Azure Virtual Desktop. (Default: ADDS)"
               }
             },
-            "varFslogixStorageName": {
+            "FslogixStorageName": {
               "type": "string",
-              "defaultValue": "stfslavdxtbiz",
               "metadata": {
                 "description": "Required, the storage account name for the FSLogix profile container"
               }
             },
-            "varFslogixFileShareName": {
+            "FslogixFileShareName": {
               "type": "string",
-              "defaultValue": "fslogix-pc-app1-test-use2-001",
               "metadata": {
                 "description": "Required, the file share name for the FSLogix profile container"
+              }
+            },
+            "BaseScriptUri": {
+              "type": "string",
+              "metadata": {
+                "description": "Required, the file for configuring the session host"
+              }
+            },
+            "VmssName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required, the name of the virtual machine scale set"
               }
             }
           },
@@ -223,11 +269,38 @@
             "varRequireNvidiaGPU": "[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
             "varVMNumber": "[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
             "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]",
-            "varBaseScriptUri": "https://raw.githubusercontent.com/ARPA-H/avdaccelerator-nih/main/workload/",
-            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration.ps1', variables('varBaseScriptUri'))]",
+            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration.ps1', parameters('BaseScriptUri'))]",
             "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration.ps1",
-            "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('varFslogixStorageName'), environment().suffixes.storage, parameters('varFslogixFileShareName'))]",
-            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('varFslogixStorageName'), environment().suffixes.storage)]"
+            "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
+            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
+            "fslogix": true,
+            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
+            "varAmdVmSizes": [
+              "Standard_NV4as_v4",
+              "Standard_NV8as_v4",
+              "Standard_NV16as_v4",
+              "Standard_NV32as_v4"
+            ],
+            "varAmdVmSize": "[contains(variables('varAmdVmSizes'), parameters('VMSize'))]",
+            "varNvidiaVmSizes": [
+              "Standard_NV6",
+              "Standard_NV12",
+              "Standard_NV24",
+              "Standard_NV12s_v3",
+              "Standard_NV24s_v3",
+              "Standard_NV48s_v3",
+              "Standard_NC4as_T4_v3",
+              "Standard_NC8as_T4_v3",
+              "Standard_NC16as_T4_v3",
+              "Standard_NC64as_T4_v3",
+              "Standard_NV6ads_A10_v5",
+              "Standard_NV12ads_A10_v5",
+              "Standard_NV18ads_A10_v5",
+              "Standard_NV36ads_A10_v5",
+              "Standard_NV36adms_A10_v5",
+              "Standard_NV72ads_A10_v5"
+            ],
+            "varNvidiaVmSize": "[contains(variables('varNvidiaVmSizes'), parameters('VMSize'))]"
           },
           "resources": [
             {
@@ -254,22 +327,6 @@
                     "disableAlerts": "false"
                   }
                 }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
-              ]
-            },
-            {
-              "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2023-09-01",
-              "name": "[format('{0}/{1}', parameters('VMName'), 'deployAzureMonitoring')]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "publisher": "Microsoft.Azure.Monitor",
-                "type": "AzureMonitorWindowsAgent",
-                "typeHandlerVersion": "1.22",
-                "autoUpgradeMinorVersion": true,
-                "settings": {}
               },
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
@@ -366,6 +423,37 @@
               ]
             },
             {
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-09-01",
+              "name": "[format('{0}/{1}', parameters('VMName'), 'MicrosoftAntiMalware')]",
+              "location": "[parameters('Location')]",
+              "properties": {
+                "publisher": "Microsoft.Azure.Security",
+                "type": "IaaSAntimalware",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "enableAutomaticUpgrade": false,
+                "settings": {
+                  "AntimalwareEnabled": true,
+                  "RealtimeProtectionEnabled": "true",
+                  "ScheduledScanSettings": {
+                    "isEnabled": "true",
+                    "day": "7",
+                    "time": "120",
+                    "scanType": "Quick"
+                  },
+                  "Exclusions": {
+                    "Extensions": "*.vhd;*.vhdx",
+                    "Paths": "[format('\"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;{0}\\*\\*.VHD;{1}\\*\\*.VHDX', variables('varFslogixSharePath'), variables('varFslogixSharePath'))]",
+                    "Processes": "%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe"
+                  }
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+              ]
+            },
+            {
               "type": "Microsoft.Network/networkInterfaces",
               "apiVersion": "2023-09-01",
               "name": "[format('{0}-vNIC', parameters('VMName'))]",
@@ -428,7 +516,10 @@
                     }
                   ]
                 },
-                "licenseType": "Windows_Client"
+                "licenseType": "Windows_Client",
+                "virtualMachineScaleSet": {
+                  "id": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
+                }
               },
               "tags": "[parameters('Tags')]",
               "dependsOn": [
@@ -436,176 +527,20 @@
               ]
             },
             {
-              "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
-              "name": "SH-Config",
+              "type": "Microsoft.Compute/virtualMachines/extensions",
+              "apiVersion": "2023-09-01",
+              "name": "[format('{0}/{1}', parameters('VMName'), 'SH-Config')]",
+              "location": "[parameters('Location')]",
               "properties": {
-                "expressionEvaluationOptions": {
-                  "scope": "inner"
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.10",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": "[array(variables('varSessionHostConfigurationScriptUri'))]"
                 },
-                "mode": "Incremental",
-                "parameters": {
-                  "location": {
-                    "value": "[parameters('Location')]"
-                  },
-                  "name": {
-                    "value": "sessionHostConfiguration"
-                  },
-                  "hostPoolToken": {
-                    "value": ""
-                  },
-                  "baseScriptUri": {
-                    "value": "[variables('varSessionHostConfigurationScriptUri')]"
-                  },
-                  "scriptName": {
-                    "value": "[variables('varSessionHostConfigurationScript')]"
-                  },
-                  "fslogix": {
-                    "value": true
-                  },
-                  "identityDomainName": {
-                    "value": "nih.gov"
-                  },
-                  "vmSize": {
-                    "value": "[parameters('VMSize')]"
-                  },
-                  "fslogixFileShare": {
-                    "value": "[variables('varFslogixSharePath')]"
-                  },
-                  "fslogixStorageFqdn": {
-                    "value": "[variables('varFslogixStorageFqdn')]"
-                  },
-                  "identityServiceProvider": {
-                    "value": "[parameters('avdIdentityServiceProvider')]"
-                  }
-                },
-                "template": {
-                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                  "contentVersion": "1.0.0.0",
-                  "metadata": {
-                    "_generator": {
-                      "name": "bicep",
-                      "version": "0.29.47.4906",
-                      "templateHash": "7216705815368457530"
-                    }
-                  },
-                  "parameters": {
-                    "name": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Extension deployment name."
-                      }
-                    },
-                    "identityServiceProvider": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "The service providing domain services for Azure Virtual Desktop."
-                      }
-                    },
-                    "identityDomainName": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Identity domain name."
-                      }
-                    },
-                    "location": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Location where to deploy compute services."
-                      }
-                    },
-                    "baseScriptUri": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "URI for AVD session host configuration URI path."
-                      }
-                    },
-                    "scriptName": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "URI for AVD session host configuration script."
-                      }
-                    },
-                    "fslogix": {
-                      "type": "bool",
-                      "metadata": {
-                        "description": "Deploy FSlogix configuration."
-                      }
-                    },
-                    "fslogixFileShare": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "File share path for FSlogix storage."
-                      }
-                    },
-                    "fslogixStorageFqdn": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "FSLogix storage account FDQN."
-                      }
-                    },
-                    "vmSize": {
-                      "type": "string",
-                      "metadata": {
-                        "description": "Session host VM size."
-                      }
-                    },
-                    "hostPoolToken": {
-                      "type": "securestring",
-                      "metadata": {
-                        "description": "AVD Host Pool registration token"
-                      }
-                    }
-                  },
-                  "variables": {
-                    "varScriptArguments": "[if(parameters('fslogix'), format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('identityDomainName'), variables('varAmdVmSize'), parameters('identityServiceProvider'), parameters('fslogix'), parameters('fslogixFileShare'), parameters('fslogixStorageFqdn'), parameters('hostPoolToken'), variables('varNvidiaVmSize')), format('-AmdVmSize {0} -IdentityServiceProvider {1} -Fslogix {2} -HostPoolRegistrationToken {3} -NvidiaVmSize {4} -verbose', variables('varAmdVmSize'), parameters('identityServiceProvider'), parameters('fslogix'), parameters('hostPoolToken'), variables('varNvidiaVmSize')))]",
-                    "varAmdVmSizes": [
-                      "Standard_NV4as_v4",
-                      "Standard_NV8as_v4",
-                      "Standard_NV16as_v4",
-                      "Standard_NV32as_v4"
-                    ],
-                    "varAmdVmSize": "[contains(variables('varAmdVmSizes'), parameters('vmSize'))]",
-                    "varNvidiaVmSizes": [
-                      "Standard_NV6",
-                      "Standard_NV12",
-                      "Standard_NV24",
-                      "Standard_NV12s_v3",
-                      "Standard_NV24s_v3",
-                      "Standard_NV48s_v3",
-                      "Standard_NC4as_T4_v3",
-                      "Standard_NC8as_T4_v3",
-                      "Standard_NC16as_T4_v3",
-                      "Standard_NC64as_T4_v3",
-                      "Standard_NV6ads_A10_v5",
-                      "Standard_NV12ads_A10_v5",
-                      "Standard_NV18ads_A10_v5",
-                      "Standard_NV36ads_A10_v5",
-                      "Standard_NV36adms_A10_v5",
-                      "Standard_NV72ads_A10_v5"
-                    ],
-                    "varNvidiaVmSize": "[contains(variables('varNvidiaVmSizes'), parameters('vmSize'))]"
-                  },
-                  "resources": [
-                    {
-                      "type": "Microsoft.Compute/virtualMachines/extensions",
-                      "apiVersion": "2023-09-01",
-                      "name": "[format('{0}/SessionHostConfig', parameters('name'))]",
-                      "location": "[parameters('location')]",
-                      "properties": {
-                        "publisher": "Microsoft.Compute",
-                        "type": "CustomScriptExtension",
-                        "typeHandlerVersion": "1.10",
-                        "autoUpgradeMinorVersion": true,
-                        "settings": {
-                          "fileUris": "[array(parameters('baseScriptUri'))]"
-                        },
-                        "protectedSettings": {
-                          "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} {1}', parameters('scriptName'), variables('varScriptArguments'))]"
-                        }
-                      }
-                    }
-                  ]
+                "protectedSettings": {
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} {1}', variables('varSessionHostConfigurationScript'), variables('varScriptArguments'))]"
                 }
               },
               "dependsOn": [

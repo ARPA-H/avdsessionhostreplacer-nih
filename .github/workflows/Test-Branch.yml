@@ -1,0 +1,33 @@
+name: Test getting branch name
+
+on:
+  workflow_dispatch:
+    inputs:
+        environment:
+            type: choice
+            description: Choose environment to deploy
+            options: 
+            - Test
+            - Prod
+        sessionHostToDeploy:
+          type: number
+          description: How many session desktop hosts to deploy
+          default: 2
+        remoteAppToDeploy: 
+          type: number
+          description: How many remote app hosts to deploy
+          default: 2
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }} environment
+    runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v1
+        
+      - name: Branch name
+        run: echo running on branch ${BRANCH_NAME}
