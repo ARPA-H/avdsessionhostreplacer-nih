@@ -61,7 +61,7 @@ jobs:
              -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
              -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
              -Branch $BRANCH_NAME `
-             -GalleryImageId '$GALLERY_IMAGE_ID'
+             -VMImageId '${{ secrets.GALLERY_IMAGE_ID }}'
             azPSVersion: "latest"
             errorActionPreference: stop
 
@@ -89,7 +89,7 @@ jobs:
               -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
               -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }} `
               -Branch $BRANCH_NAME `
-              -GalleryImageId '$GALLERY_IMAGE_ID'
+              -VMImageId '${{ secrets.GALLERY_IMAGE_ID }}'
             azPSVersion: "latest"
             errorActionPreference: continue
             

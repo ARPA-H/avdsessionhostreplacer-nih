@@ -19,7 +19,7 @@ param (
     [string]$DeploymentEnvironment,
     [int]$TargetSessionHostCount,
     [string]$Branch,
-    [string]$GalleryImageId
+    [string]$VMImageId
 
 )
 
@@ -68,7 +68,7 @@ $TemplateParameters = @{
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
     MarketPlaceImage                             = 'win11-24h2-avd-m365'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
-    GalleryImageId = '/subscriptions/87a23dae-87b7-4372-b94f-92e72de0705e/resourceGroups/rg-avd-golden-image/providers/Microsoft.Compute/galleries/acgavd/images/GoldenImageAVDArpaH' # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
+    GalleryImageId                               = $VMImageId # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
 
     SecurityType                                 = 'TrustedLaunch' # Standard, TrustedLaunch, or ConfidentialVM
     SecureBootEnabled                            = $true
@@ -107,7 +107,6 @@ $TemplateParameters = @{
 }
 
 $paramNewAzResourceGroupDeployment = @{
-    #Name = 'AVDSessionHostReplacer'
     Name = $TemplateName
     ResourceGroupName = $ResourceGroupName
     #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.0.1-beta.0/deploy/arm/DeployAVDSessionHostReplacer.json'
@@ -118,8 +117,7 @@ $paramNewAzResourceGroupDeployment = @{
 
     # arpa-h template
     TemplateUri = "https://raw.githubusercontent.com/ARPA-H/avdsessionhostreplacer-nih/$Branch/deploy/arm/DeployAVDSessionHostReplacer-arpah.json"
-    #TemplateUri = 'https://raw.githubusercontent.com/ARPA-H/avdsessionhostreplacer-nih/main/deploy/arm/DeployAVDSessionHostReplacer-arpah.json'
-
+    
     # If you cloned the repo and want to deploy using the bicep file use this instead of the above line
     #TemplateFile = '.\deploy\bicep\DeployAVDSessionHostReplacer-arpah.bicep'
     TemplateParameterObject = $TemplateParameters
