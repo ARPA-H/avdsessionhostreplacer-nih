@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.31.92.45157",
-      "templateHash": "1366719056275086263"
+      "templateHash": "9008973860726612514"
     }
   },
   "parameters": {
@@ -531,13 +531,13 @@
                 "value": "[parameters('IntuneEnrollment')]"
               },
               {
-                  "name": "_ClientId",
-                  "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId, '')]"
-                },
-                {
-                  "name": "_TenantId",
-                  "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId, '')]"
-                },
+                "name": "_ClientId",
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
+              },
+              {
+                "name": "_TenantId",
+                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
+              },
               {
                 "name": "_GraphEnvironmentName",
                 "value": "[variables('varGraphEnvironmentName')]"
@@ -615,7 +615,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.31.92.45157",
-              "templateHash": "7853922308517460369"
+              "templateHash": "18122321177996368079"
             }
           },
           "parameters": {
@@ -647,11 +647,18 @@
                 "description": "Required: Yes | Name of the Function App."
               }
             },
+            "OfflineDeploy": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Required: No | Boolean to enable offline deployment of the Function App. | Default: false"
+              }
+            },
             "FunctionAppZipUrl": {
               "type": "string",
-              "defaultValue": "https://github.com/Azure/AVDSessionHostReplacer/releases/download/v0.3.0/FunctionApp.zip",
+              "defaultValue": "",
               "metadata": {
-                "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. | Default: The latest release of the Function App code."
+                "description": "Required: No | URL of the FunctionApp.zip file. This is the zip file containing the Function App code. Must be provided when OfflineDeploy is set to false | Default: Empty"
               }
             },
             "AppPlanName": {
@@ -692,8 +699,9 @@
           },
           "resources": [
             {
+              "condition": "[not(parameters('OfflineDeploy'))]",
               "type": "Microsoft.Web/sites/extensions",
-              "apiVersion": "2023-01-01",
+              "apiVersion": "2023-12-01",
               "name": "[format('{0}/{1}', parameters('FunctionAppName'), 'MSDeploy')]",
               "properties": {
                 "packageUri": "[parameters('FunctionAppZipUrl')]"
@@ -765,8 +773,7 @@
                 "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('varAppServicePlanName'))]",
                 "siteConfig": {
                   "use32BitWorkerProcess": false,
-                  "powerShellVersion": "7.2",
-                  "netFrameworkVersion": "v6.0",
+                  "powerShellVersion": "7.4",
                   "appSettings": "[union(createArray(createObject('name', 'FUNCTIONS_EXTENSION_VERSION', 'value', '~4'), createObject('name', 'FUNCTIONS_WORKER_RUNTIME', 'value', 'powershell'), createObject('name', 'AzureWebJobsStorage', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING', 'value', format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', variables('varStorageAccountName'), environment().suffixes.storage, listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('varStorageAccountName')), '2022-05-01').keys[0].value)), createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey), createObject('name', 'WEBSITE_CONTENTSHARE', 'value', toLower(parameters('FunctionAppName')))), if(parameters('EnableMonitoring'), createArray(createObject('name', 'APPINSIGHTS_INSTRUMENTATIONKEY', 'value', reference(resourceId('Microsoft.Insights/components', variables('varAppServicePlanName')), '2020-02-02').InstrumentationKey)), createArray()), parameters('ReplacementPlanSettings'))]",
                   "ftpsState": "Disabled",
                   "cors": {
