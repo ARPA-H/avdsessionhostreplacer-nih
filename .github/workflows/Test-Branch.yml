@@ -24,10 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+      GALLERY_IMAGE_ID: ${{ secrets.GALLERY_IMAGE_ID }}
 
     steps:
       - name: Git checkout
         uses: actions/checkout@v1
         
       - name: Branch name
-        run: echo running on branch ${BRANCH_NAME}
+        run: echo running on branch $BRANCH_NAME
+      - name: Gallery Image Id
+        run: echo running on branch $GALLERY_IMAGE_ID
