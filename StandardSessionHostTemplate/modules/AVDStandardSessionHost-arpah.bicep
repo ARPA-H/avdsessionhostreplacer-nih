@@ -46,6 +46,9 @@ param BaseScriptUri string
 @sys.description('Required, the name of the virtual machine scale set')
 param VmssName string
 
+@sys.description('Required, the name of the data collection rule')
+param DataCollectionRuleName string
+
 // @sys.description('Required, Host Pool Resource Group')
 // param HostPoolResourceGroup string
 
@@ -341,6 +344,25 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
 //       sessionHosts
 //   ]
 // }]
+
+// get existing DCR
+
+resource existingDataCollectionRule 'Microsoft.Insights/dataCollectionRules@2022-06-01' existing = {
+  name: DataCollectionRuleName
+}
+
+// Data collection rule association
+module dataCollectionRuleAssociation '.bicep/dataCollectionRulesAssociation.bicep' =  {
+  //scope: resourceGroup('${subscriptionId}', '${computeObjectsRgName}')
+  name: 'DCR-Asso-${VMName}'
+  params: {
+      virtualMachineName: VMName
+      dataCollectionRuleId: existingDataCollectionRule.id
+  }
+  dependsOn: [
+      VM
+  ]
+}
 
 resource sessionHostConfig 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
   name:'SH-Config'
