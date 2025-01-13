@@ -42,6 +42,9 @@ param BaseScriptUri string
 @sys.description('Required, the name of the virtual machine scale set')
 param VmssName string
 
+@sys.description('Required, the name of the data collection rule')
+param DataCollectionRuleName string
+
 // @sys.description('Required, Host Pool Resource Group')
 // param HostPoolResourceGroup string
 
@@ -70,6 +73,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     FslogixStorageName: FslogixStorageName
     FslogixFileShareName: FslogixFileShareName
     VmssName: VmssName
+    DataCollectionRuleName:DataCollectionRuleName
     // HostPoolResourceGroup: HostPoolResourceGroup
     // FunctionAppName: FunctionAppName
     Tags: Tags

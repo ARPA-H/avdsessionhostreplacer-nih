@@ -175,6 +175,10 @@ param BaseScriptUri string
 
 @sys.description('Required, the name of the virtual machine scale set')
 param VmssName string
+
+@sys.description('Required, the name of the data collection rule')
+param DataCollectionRuleName string = 'dcr-avd-${toLower(DeploymentEnvironment)}-use2'
+
 /////////////////
 
 //---- Variables ----//
@@ -310,6 +314,7 @@ var varSessionHostTemplateParameters = {
   FslogixStorageName: FslogixStorageName
   FslogixFileShareName: FslogixFileShareName
   VmssName: VmssName
+  DataCollectionRuleName: DataCollectionRuleName
   // HostPoolResourceGroup: HostPoolResourceGroupName
   // FunctionAppName: varFunctionAppName
   
