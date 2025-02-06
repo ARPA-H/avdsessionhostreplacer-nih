@@ -93,7 +93,7 @@ $TemplateParameters = @{
     TagDeployTimestamp                           = 'AutoReplaceDeployTimestamp'
     TagPendingDrainTimestamp                     = 'AutoReplacePendingDrainTimestamp'
     TagScalingPlanExclusionTag                   = 'ScalingPlanExclusion' # This is used to disable scaling plan on session hosts pending delete.
-    TargetVMAgeDays                              = 45 # Set this to 0 to never consider hosts to be old. Not recommended as you may use it to force replace.
+    TargetVMAgeDays                              = 25 # Set this to 0 to never consider hosts to be old. Not recommended as you may use it to force replace.
 
     DrainGracePeriodHours                        = 24
     FixSessionHostTags                           = $true
