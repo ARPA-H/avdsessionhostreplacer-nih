@@ -57,7 +57,7 @@ jobs:
              -FslogixStorageName ''${{ secrets.SESSION_HOST_STORAGE }}' `
              -FslogixFileShareName 'fslogix-pc-app1-${{ github.event.inputs.environment }}-use2-001' `
              -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
-             -VMPostFix 'sd' `
+             -VMPostFix 'avdshrpsd' `
              -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
              -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
              -Branch $BRANCH_NAME `
@@ -85,7 +85,7 @@ jobs:
               -FslogixStorageName '${{ secrets.RA_STORAGE }}' `
               -FslogixFileShareName 'fslogix-pc-remoteapps-${{ github.event.inputs.environment }}-use2-001' `
               -VmssName 'vmss-avdx-${{ github.event.inputs.environment }}-use2-001' `
-              -VMPostFix 'ra' `
+              -VMPostFix 'avdshrpra' `
               -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
               -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }} `
               -Branch $BRANCH_NAME `
