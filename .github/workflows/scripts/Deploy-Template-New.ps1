@@ -124,7 +124,7 @@ $paramNewAzResourceGroupDeployment = @{
     TemplateParameterObject = $TemplateParameters
 }
 
-New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
+#New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
 
-#Write-Output $paramNewAzResourceGroupDeployment
-#Write-Output $TemplateParameters
+Write-Output $paramNewAzResourceGroupDeployment
+Write-Output $TemplateParameters
