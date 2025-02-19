@@ -62,7 +62,6 @@ jobs:
              -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
              -Branch ${{ env.BRANCH_NAME }} `
              -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}'
-
             azPSVersion: "latest"
             errorActionPreference: stop
 
