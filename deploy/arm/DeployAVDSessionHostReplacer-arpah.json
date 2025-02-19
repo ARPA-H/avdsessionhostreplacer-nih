@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.32.4.45862",
-      "templateHash": "3830509141948541713"
+      "version": "0.33.93.31351",
+      "templateHash": "14991744215724608452"
     }
   },
   "parameters": {
@@ -622,8 +622,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "15762329565926368937"
+              "version": "0.33.93.31351",
+              "templateHash": "13409817767727311647"
             }
           },
           "parameters": {
@@ -825,8 +825,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.32.4.45862",
-                      "templateHash": "10102527435631023526"
+                      "version": "0.33.93.31351",
+                      "templateHash": "3087335480340646655"
                     }
                   },
                   "parameters": {
@@ -893,8 +893,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "6395369130208277652"
+              "version": "0.33.93.31351",
+              "templateHash": "5290702374927177390"
             }
           },
           "parameters": {
@@ -1599,8 +1599,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "10102527435631023526"
+              "version": "0.33.93.31351",
+              "templateHash": "3087335480340646655"
             }
           },
           "parameters": {
@@ -1660,8 +1660,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "10102527435631023526"
+              "version": "0.33.93.31351",
+              "templateHash": "3087335480340646655"
             }
           },
           "parameters": {
