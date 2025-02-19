@@ -1,4 +1,4 @@
-param (
+﻿param (
     [string]$DomJoinUserName,
     [string]$DomJoinUserPassword,
     [string]$OUName,

@@ -40,7 +40,7 @@ jobs:
       - name: Run Azure PowerShell Script File to deploy session host replacer to the session desktop host pool in the ${{ github.event.inputs.environment }} environment
         uses: azure/powershell@v2
         with:
-            inlineScript: ./.github/workflows/scripts/Deploy-Template.ps1 `
+            inlineScript: ./.github/workflows/scripts/Deploy-Template-New.ps1 `
              -DomJoinUserName '${{ secrets.AD_JOIN_USER }}' `
              -DomJoinUserPassword '${{ secrets.AD_JOIN_PASS }}' `
              -OUName '${{ secrets.AD_OU }}' `
@@ -69,7 +69,7 @@ jobs:
       - name: Run Azure PowerShell Script File to deploy session host replacer to the remote app host poool in the ${{ github.event.inputs.environment }} environment
         uses: azure/powershell@v2
         with:
-            inlineScript: ./.github/workflows/scripts/Deploy-Template.ps1 `
+            inlineScript: ./.github/workflows/scripts/Deploy-Template-New.ps1 `
               -DomJoinUserName '${{ secrets.AD_JOIN_USER }}' `
               -DomJoinUserPassword '${{ secrets.AD_JOIN_PASS }}' `
               -OUName '${{ secrets.AD_OU }}' `
