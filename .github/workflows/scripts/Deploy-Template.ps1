@@ -19,7 +19,7 @@ param (
     [string]$DeploymentEnvironment,
     [int]$TargetSessionHostCount,
     [string]$Branch,
-    [string]$VMImageId
+    [string]$GalleryImageId
 
 )
 
