@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
-      GALLERY_IMAGE_ID: ${{ secrets.GALLERY_IMAGE_ID }}
+      #GALLERY_IMAGE_ID: ${{ secrets.GALLERY_IMAGE_ID }}
 
     steps:
       - name: Checkout code
@@ -61,7 +61,7 @@ jobs:
              -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
              -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
              -Branch ${{ env.BRANCH_NAME }} `
-             -VMImageId '${{ env.GALLERY_IMAGE_ID }}'
+             -VMImageId '${{ secrets.GALLERY_IMAGE_ID }}'
 
             azPSVersion: "latest"
             errorActionPreference: stop
@@ -90,7 +90,7 @@ jobs:
               -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
               -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }} `
               -Branch ${{ env.BRANCH_NAME }} `
-              -VMImageId '${{ env.GALLERY_IMAGE_ID }}'
+              -VMImageId '${{ secrets.GALLERY_IMAGE_ID }}'
             azPSVersion: "latest"
             errorActionPreference: continue
             
