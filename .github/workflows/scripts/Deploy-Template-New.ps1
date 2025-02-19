@@ -18,8 +18,8 @@
     [string]$VMPostFix,
     [string]$DeploymentEnvironment,
     [int]$TargetSessionHostCount,
-    [string]$Branch,
-    [string]$VMImageId
+    [string]$Branch #,
+    #[string]$VMImageId
 
 )
 
@@ -69,7 +69,7 @@ $TemplateParameters = @{
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
     MarketPlaceImage                             = 'win11-24h2-avd-m365'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
-    GalleryImageId                               = $VMImageId # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
+    #GalleryImageId                               = $VMImageId # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
 
     SecurityType                                 = 'TrustedLaunch' # Standard, TrustedLaunch, or ConfidentialVM
     SecureBootEnabled                            = $true
