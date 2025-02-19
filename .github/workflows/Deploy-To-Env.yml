@@ -60,7 +60,7 @@ jobs:
             -VMPostFix 'avdshrpsd' ` 
             -DeploymentEnvironment '${{ github.event.inputs.environment }}' ` 
             -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} ` 
-            -Branch ${{ env.BRANCH_NAME }} 
+            -Branch '${{ env.BRANCH_NAME }}' 
           azPSVersion: "latest"
           errorActionPreference: stop
 
