@@ -26,7 +26,6 @@
 #$ResourceGroupName = '' # Same as the Host Pool RG
 
 $TemplateName = "AVDSHR-$AppPoolType"
-#$Branch = 'main'
 
 $TemplateParameters = @{
     EnableMonitoring                             = $true

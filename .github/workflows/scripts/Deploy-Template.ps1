@@ -23,10 +23,7 @@ param (
 
 )
 
-#$ResourceGroupName = '' # Same as the Host Pool RG
-
 $TemplateName = "AVDSHR-$AppPoolType"
-#$Branch = 'main'
 
 $TemplateParameters = @{
     EnableMonitoring                             = $true
@@ -61,8 +58,6 @@ $TemplateParameters = @{
     #AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
     AvailabilityZones                            = @("1") # Set to empty array if not using AZs
     SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
-    #SessionHostSize                              = 'Standard_E4s_v5' # Make sure its available in the region / AZs
-
     AcceleratedNetworking                        = $false # Make sure the size supports it
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
 
@@ -74,9 +69,7 @@ $TemplateParameters = @{
     SecurityType                                 = 'TrustedLaunch' # Standard, TrustedLaunch, or ConfidentialVM
     SecureBootEnabled                            = $true
     TpmEnabled                                   = $true
-
     SubnetId                                     = $SubnetId
-
     IdentityServiceProvider                      = 'ActiveDirectory' # EntraID / ActiveDirectory / EntraDS
     IntuneEnrollment                             = $false # This is only used when IdentityServiceProvider is EntraID
 
@@ -85,9 +78,7 @@ $TemplateParameters = @{
     ADDomainJoinUserName = $DomJoinUserName
     ADJoinUserPassword = $DomJoinUserPassword # We will store this password in a key vault
     ADOUPath = $OUName  # OU DN where the session hosts will be joined
-
     LocalAdminUserName                           = $LocalAdminUserName # The password is randomly generated. Please use LAPS or reset from Azure Portal.
-
 
     ## Optional Parameters ##
     TagIncludeInAutomation                       = 'IncludeInAutoReplace'
