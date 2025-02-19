@@ -62,7 +62,7 @@ jobs:
             -DeploymentEnvironment '${{ github.event.inputs.environment }}' ` 
             -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} ` 
             -Branch ${{ env.BRANCH_NAME }} ` 
-            -GalleryImageId '/subscriptions/3f748230-92a7-e7df-b757-eed3a2b4b09/resourceGroups/edog-nvelrag-m-id-g/providers/Microsoft.Compute/galleries/somecomputegal/images/SomeImageName'
+            -GalleryImageId "/subscriptions/3f748230-92a7-e7df-b757-eed3a2b4b09/resourceGroups/edog-nvelrag-m-id-g/providers/Microsoft.Compute/galleries/somecomputegal/images/SomeImageName"
           azPSVersion: "latest"
           errorActionPreference: stop
 
