@@ -218,6 +218,10 @@ var varFunctionAppSettings = [
     name: '_ReplaceSessionHostOnNewImageVersionDelayDays'
     value: ReplaceSessionHostOnNewImageVersionDelayDays
   }
+  {
+    name: 'WEBSITE_TIME_ZONE'
+    value: 'Eastern Standard Time'
+  }
 ]
 
 var varAppServicePlanName = '${FunctionAppName}-asp'
