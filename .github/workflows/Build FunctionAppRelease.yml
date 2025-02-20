@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - Development
+      - main
     paths:
       - 'FunctionApp/**'
   workflow_dispatch:
