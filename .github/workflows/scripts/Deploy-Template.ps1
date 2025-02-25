@@ -98,7 +98,6 @@ $TemplateParameters = @{
     SessionHostResourceGroupName                 = $SessionHostResourceGroupName # Leave empty if same as HostPoolResourceGroupName
     DeploymentEnvironment                        = $DeploymentEnvironment
     MonitoringResourceGroupName                  = $MonitoringResourceGroupName # Resource Group where the monitoring resources are deployed
-    MonitoringWorkspaceName                      = 'AVDSessionHostReplacer' # Name of the Log Analytics Workspace
 }
 
 $paramNewAzResourceGroupDeployment = @{
