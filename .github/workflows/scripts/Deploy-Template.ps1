@@ -19,7 +19,8 @@ param (
     [string]$DeploymentEnvironment,
     [int]$TargetSessionHostCount,
     [string]$Branch,
-    [string]$GalleryImageId
+    [string]$GalleryImageId,
+    [string]$MonitoringResourceGroupName
 
 )
 
@@ -96,6 +97,8 @@ $TemplateParameters = @{
     VMNamesTemplateParameterName                 = 'VMNames' # Do not change this unless using a custom Template to deploy
     SessionHostResourceGroupName                 = $SessionHostResourceGroupName # Leave empty if same as HostPoolResourceGroupName
     DeploymentEnvironment                        = $DeploymentEnvironment
+    MonitoringResourceGroupName                  = $MonitoringResourceGroupName # Resource Group where the monitoring resources are deployed
+    MonitoringWorkspaceName                      = 'AVDSessionHostReplacer' # Name of the Log Analytics Workspace
 }
 
 $paramNewAzResourceGroupDeployment = @{

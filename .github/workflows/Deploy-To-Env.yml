@@ -61,7 +61,8 @@ jobs:
              -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
              -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
              -Branch ${{ env.BRANCH_NAME }} `
-             -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}'
+             -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}' 
+             -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}'
 
             azPSVersion: "latest"
             errorActionPreference: stop
@@ -90,7 +91,8 @@ jobs:
               -DeploymentEnvironment '${{ github.event.inputs.environment }}' `
               -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }} `
               -Branch ${{ env.BRANCH_NAME }} `
-              -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}'
+              -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}' 
+              -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}'
             azPSVersion: "latest"
             errorActionPreference: continue
             

@@ -179,6 +179,9 @@ param VmssName string
 @sys.description('Required, the name of the data collection rule')
 param DataCollectionRuleName string = 'dcr-avd-${toLower(DeploymentEnvironment)}-use2'
 
+@sys.description('Required, the name of the monitoring resource group')
+param MonitoringResourceGroupName string
+
 /////////////////
 
 //---- Variables ----//
@@ -314,7 +317,7 @@ var varSessionHostTemplateParameters = {
   FslogixStorageName: FslogixStorageName
   FslogixFileShareName: FslogixFileShareName
   VmssName: VmssName
-  DataCollectionRuleName: DataCollectionRuleName
+  DataCollectionRuleName: existingDataCollectionRule.id
   // HostPoolResourceGroup: HostPoolResourceGroupName
   // FunctionAppName: varFunctionAppName
   
@@ -519,6 +522,11 @@ module deployStandardSessionHostTemplate 'modules/deployStandardTemplateSpec-arp
     Location: Location
     Name: '${HostPoolName}-Spec'
   }
+}
+
+resource existingDataCollectionRule 'Microsoft.Insights/dataCollectionRules@2022-06-01' existing = {
+  name: DataCollectionRuleName
+  scope: resourceGroup('${subscription().subscriptionId}', '${MonitoringResourceGroupName}')
 }
 
 // module deploySessionHost '../../StandardSessionHostTemplate/DeploySessionHosts-arpah.bicep' = {

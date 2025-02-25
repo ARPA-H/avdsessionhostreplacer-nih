@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.32.4.45862",
-      "templateHash": "2762136276231443146"
+      "version": "0.33.93.31351",
+      "templateHash": "3576638655273476029"
     }
   },
   "parameters": {
@@ -180,8 +180,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.32.4.45862",
-              "templateHash": "15172783491007741085"
+              "version": "0.33.93.31351",
+              "templateHash": "5423582213513204382"
             }
           },
           "parameters": {
@@ -576,7 +576,7 @@
                     "value": "[parameters('VMName')]"
                   },
                   "dataCollectionRuleId": {
-                    "value": "[resourceId('Microsoft.Insights/dataCollectionRules', parameters('DataCollectionRuleName'))]"
+                    "value": "[parameters('DataCollectionRuleName')]"
                   }
                 },
                 "template": {
@@ -585,8 +585,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.32.4.45862",
-                      "templateHash": "16098006620978243706"
+                      "version": "0.33.93.31351",
+                      "templateHash": "6919490302839277834"
                     }
                   },
                   "parameters": {

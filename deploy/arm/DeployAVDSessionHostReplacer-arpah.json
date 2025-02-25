@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.93.31351",
-      "templateHash": "14991744215724608452"
+      "templateHash": "31615883419847765"
     }
   },
   "parameters": {
@@ -358,6 +358,12 @@
       "metadata": {
         "description": "Required, the name of the data collection rule"
       }
+    },
+    "MonitoringResourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the name of the monitoring resource group"
+      }
     }
   },
   "variables": {
@@ -453,7 +459,7 @@
       "FslogixStorageName": "[parameters('FslogixStorageName')]",
       "FslogixFileShareName": "[parameters('FslogixFileShareName')]",
       "VmssName": "[parameters('VmssName')]",
-      "DataCollectionRuleName": "[parameters('DataCollectionRuleName')]",
+      "DataCollectionRuleName": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', subscription().subscriptionId), format('{0}', parameters('MonitoringResourceGroupName'))), 'Microsoft.Insights/dataCollectionRules', parameters('DataCollectionRuleName'))]",
       "tags": {}
     },
     "varAzureEnvironments": [
@@ -538,7 +544,7 @@
                 "name": "_RemoveIntuneDevice",
                 "value": "[parameters('IntuneEnrollment')]"
               },
-               {
+              {
                   "name": "_ClientId",
                   "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId, '')]"
                 },
@@ -894,7 +900,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.33.93.31351",
-              "templateHash": "5290702374927177390"
+              "templateHash": "7322065983166486815"
             }
           },
           "parameters": {
@@ -913,8 +919,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.32.4.45862",
-                  "templateHash": "2762136276231443146"
+                  "version": "0.33.93.31351",
+                  "templateHash": "3576638655273476029"
                 }
               },
               "parameters": {
@@ -1089,8 +1095,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.32.4.45862",
-                          "templateHash": "15172783491007741085"
+                          "version": "0.33.93.31351",
+                          "templateHash": "5423582213513204382"
                         }
                       },
                       "parameters": {
@@ -1485,7 +1491,7 @@
                                 "value": "[[parameters('VMName')]"
                               },
                               "dataCollectionRuleId": {
-                                "value": "[[resourceId('Microsoft.Insights/dataCollectionRules', parameters('DataCollectionRuleName'))]"
+                                "value": "[[parameters('DataCollectionRuleName')]"
                               }
                             },
                             "template": {
@@ -1494,8 +1500,8 @@
                               "metadata": {
                                 "_generator": {
                                   "name": "bicep",
-                                  "version": "0.32.4.45862",
-                                  "templateHash": "16098006620978243706"
+                                  "version": "0.33.93.31351",
+                                  "templateHash": "6919490302839277834"
                                 }
                               },
                               "parameters": {

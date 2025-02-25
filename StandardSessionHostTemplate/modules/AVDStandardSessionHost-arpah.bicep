@@ -347,9 +347,9 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
 
 // get existing DCR
 
-resource existingDataCollectionRule 'Microsoft.Insights/dataCollectionRules@2022-06-01' existing = {
-  name: DataCollectionRuleName
-}
+// resource existingDataCollectionRule 'Microsoft.Insights/dataCollectionRules@2022-06-01' existing = {
+//   name: DataCollectionRuleName
+// }
 
 // Data collection rule association
 module dataCollectionRuleAssociation '.bicep/dataCollectionRulesAssociation.bicep' =  {
@@ -357,7 +357,7 @@ module dataCollectionRuleAssociation '.bicep/dataCollectionRulesAssociation.bice
   name: 'DCR-Asso-${VMName}'
   params: {
       virtualMachineName: VMName
-      dataCollectionRuleId: existingDataCollectionRule.id
+      dataCollectionRuleId: DataCollectionRuleName
   }
   dependsOn: [
       VM

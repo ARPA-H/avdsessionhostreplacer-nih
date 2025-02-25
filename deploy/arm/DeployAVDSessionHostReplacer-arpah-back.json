@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.31.92.45157",
-      "templateHash": "9008973860726612514"
+      "version": "0.33.93.31351",
+      "templateHash": "14991744215724608452"
     }
   },
   "parameters": {
@@ -351,6 +351,13 @@
       "metadata": {
         "description": "Required, the name of the virtual machine scale set"
       }
+    },
+    "DataCollectionRuleName": {
+      "type": "string",
+      "defaultValue": "[format('dcr-avd-{0}-use2', toLower(parameters('DeploymentEnvironment')))]",
+      "metadata": {
+        "description": "Required, the name of the data collection rule"
+      }
     }
   },
   "variables": {
@@ -446,6 +453,7 @@
       "FslogixStorageName": "[parameters('FslogixStorageName')]",
       "FslogixFileShareName": "[parameters('FslogixFileShareName')]",
       "VmssName": "[parameters('VmssName')]",
+      "DataCollectionRuleName": "[parameters('DataCollectionRuleName')]",
       "tags": {}
     },
     "varAzureEnvironments": [
@@ -530,14 +538,14 @@
                 "name": "_RemoveIntuneDevice",
                 "value": "[parameters('IntuneEnrollment')]"
               },
-              {
-                "name": "_ClientId",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId]"
-              },
-              {
-                "name": "_TenantId",
-                "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId]"
-              },
+               {
+                  "name": "_ClientId",
+                  "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').clientId, '')]"
+                },
+                {
+                  "name": "_TenantId",
+                  "value": "[if(parameters('UseUserAssignedManagedIdentity'), reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[2], split(parameters('UserAssignedManagedIdentityResourceId'), '/')[4]), 'Microsoft.ManagedIdentity/userAssignedIdentities', split(parameters('UserAssignedManagedIdentityResourceId'), '/')[8]), '2023-01-31').tenantId, '')]"
+                },
               {
                 "name": "_GraphEnvironmentName",
                 "value": "[variables('varGraphEnvironmentName')]"
@@ -614,8 +622,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "18122321177996368079"
+              "version": "0.33.93.31351",
+              "templateHash": "13409817767727311647"
             }
           },
           "parameters": {
@@ -817,8 +825,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.31.92.45157",
-                      "templateHash": "2127924129757676299"
+                      "version": "0.33.93.31351",
+                      "templateHash": "3087335480340646655"
                     }
                   },
                   "parameters": {
@@ -885,8 +893,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "8352303731969789919"
+              "version": "0.33.93.31351",
+              "templateHash": "5290702374927177390"
             }
           },
           "parameters": {
@@ -905,8 +913,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.30.23.60470",
-                  "templateHash": "3521017038180227319"
+                  "version": "0.32.4.45862",
+                  "templateHash": "2762136276231443146"
                 }
               },
               "parameters": {
@@ -988,6 +996,12 @@
                   "metadata": {
                     "description": "Required, the name of the virtual machine scale set"
                   }
+                },
+                "DataCollectionRuleName": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "Required, the name of the data collection rule"
+                  }
                 }
               },
               "resources": [
@@ -1062,6 +1076,9 @@
                       "VmssName": {
                         "value": "[[parameters('VmssName')]"
                       },
+                      "DataCollectionRuleName": {
+                        "value": "[[parameters('DataCollectionRuleName')]"
+                      },
                       "Tags": {
                         "value": "[[parameters('Tags')]"
                       }
@@ -1072,8 +1089,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.30.23.60470",
-                          "templateHash": "11842139683107399331"
+                          "version": "0.32.4.45862",
+                          "templateHash": "15172783491007741085"
                         }
                       },
                       "parameters": {
@@ -1163,6 +1180,12 @@
                           "type": "string",
                           "metadata": {
                             "description": "Required, the name of the virtual machine scale set"
+                          }
+                        },
+                        "DataCollectionRuleName": {
+                          "type": "string",
+                          "metadata": {
+                            "description": "Required, the name of the data collection rule"
                           }
                         }
                       },
@@ -1447,6 +1470,65 @@
                           "dependsOn": [
                             "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                           ]
+                        },
+                        {
+                          "type": "Microsoft.Resources/deployments",
+                          "apiVersion": "2022-09-01",
+                          "name": "[[format('DCR-Asso-{0}', parameters('VMName'))]",
+                          "properties": {
+                            "expressionEvaluationOptions": {
+                              "scope": "inner"
+                            },
+                            "mode": "Incremental",
+                            "parameters": {
+                              "virtualMachineName": {
+                                "value": "[[parameters('VMName')]"
+                              },
+                              "dataCollectionRuleId": {
+                                "value": "[[resourceId('Microsoft.Insights/dataCollectionRules', parameters('DataCollectionRuleName'))]"
+                              }
+                            },
+                            "template": {
+                              "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                              "contentVersion": "1.0.0.0",
+                              "metadata": {
+                                "_generator": {
+                                  "name": "bicep",
+                                  "version": "0.32.4.45862",
+                                  "templateHash": "16098006620978243706"
+                                }
+                              },
+                              "parameters": {
+                                "virtualMachineName": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "VM name."
+                                  }
+                                },
+                                "dataCollectionRuleId": {
+                                  "type": "string",
+                                  "metadata": {
+                                    "description": "Data collection rule ID."
+                                  }
+                                }
+                              },
+                              "resources": [
+                                {
+                                  "type": "Microsoft.Insights/dataCollectionRuleAssociations",
+                                  "apiVersion": "2022-06-01",
+                                  "scope": "[[format('Microsoft.Compute/virtualMachines/{0}', parameters('virtualMachineName'))]",
+                                  "name": "[[parameters('virtualMachineName')]",
+                                  "properties": {
+                                    "dataCollectionRuleId": "[[parameters('dataCollectionRuleId')]",
+                                    "description": "AVD Insights data collection rule association"
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                          ]
                         }
                       ]
                     }
@@ -1517,8 +1599,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "2127924129757676299"
+              "version": "0.33.93.31351",
+              "templateHash": "3087335480340646655"
             }
           },
           "parameters": {
@@ -1578,8 +1660,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.31.92.45157",
-              "templateHash": "2127924129757676299"
+              "version": "0.33.93.31351",
+              "templateHash": "3087335480340646655"
             }
           },
           "parameters": {
