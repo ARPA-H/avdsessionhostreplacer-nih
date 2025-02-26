@@ -45,7 +45,7 @@ $TemplateParameters = @{
     #SessionHostNamePrefix                        = "arpahavd$VMPostFix" # Will be appended by '-XX'
     SessionHostNamePrefix                        = $VMPostFix # Will be appended by '-XX'
     TargetSessionHostCount                       = $TargetSessionHostCount # How many session hosts to maintain in the Host Pool
-    TargetSessionHostBuffer                      = 1 # The maximum number of session hosts to add during a replacement process
+    TargetSessionHostBuffer                      = 2 # The maximum number of session hosts to add during a replacement process
     IncludePreExistingSessionHosts               = $false # Include existing session hosts in automation
 
     # Identity
@@ -86,7 +86,7 @@ $TemplateParameters = @{
     TagDeployTimestamp                           = 'AutoReplaceDeployTimestamp'
     TagPendingDrainTimestamp                     = 'AutoReplacePendingDrainTimestamp'
     TagScalingPlanExclusionTag                   = 'ScalingPlanExclusion' # This is used to disable scaling plan on session hosts pending delete.
-    TargetVMAgeDays                              = 15 # Set this to 0 to never consider hosts to be old. Not recommended as you may use it to force replace.
+    TargetVMAgeDays                              = 10 # Set this to 0 to never consider hosts to be old. Not recommended as you may use it to force replace.
 
     DrainGracePeriodHours                        = 24
     FixSessionHostTags                           = $true
