@@ -71,10 +71,13 @@ var varAvailabilityZone = AvailabilityZones == [] ? [] : [ '${AvailabilityZones[
 var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
 var varSessionHostConfigurationScript = './Set-SessionHostConfiguration.ps1'
 var varFslogixSharePath = '\\\\${FslogixStorageName}.file.${environment().suffixes.storage}\\${FslogixFileShareName}' 
-var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
+//var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
 var fslogix = true
 
-var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+//var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+//var varBaseScriptArguments = '-IdentityServiceProvider ${identityServiceProvider} -Fslogix ${fslogix} -HostPoolRegistrationToken "${hostPool.listRegistrationTokens().value[0].token}" -AmdVmSize ${varAmdVmSize} -NvidiaVmSize ${varNvidiaVmSize}'
+
 var varAmdVmSizes = [
   'Standard_NV4as_v4'
   'Standard_NV8as_v4'
@@ -211,7 +214,7 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   }
 
   // HostPool join 
-  resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
+    resource AddWVDHost 'extensions@2023-09-01' = if (HostPoolName != '') {
     // Documentation is available here: https://docs.microsoft.com/en-us/azure/virtual-machines/extensions/dsc-template
     // TODO: Update to the new format for DSC extension, see documentation above.
     name: 'JoinHostPool'
