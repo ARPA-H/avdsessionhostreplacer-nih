@@ -39,8 +39,8 @@ param FslogixFileShareName string
 @sys.description('Required, the file for configuring the session host')
 param BaseScriptUri string
 
-@sys.description('Required, the name of the virtual machine scale set')
-param VmssName string
+// @sys.description('Required, the name of the virtual machine scale set')
+// param VmssName string
 
 @sys.description('Required, the name of the data collection rule')
 param DataCollectionRuleName string
