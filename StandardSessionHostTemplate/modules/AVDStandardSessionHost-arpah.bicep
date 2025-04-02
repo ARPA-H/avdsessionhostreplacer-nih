@@ -43,8 +43,8 @@ param FslogixFileShareName string
 @sys.description('Required, the file for configuring the session host')
 param BaseScriptUri string
 
-@sys.description('Required, the name of the virtual machine scale set')
-param VmssName string
+// @sys.description('Required, the name of the virtual machine scale set')
+// param VmssName string
 
 @sys.description('Required, the name of the data collection rule')
 param DataCollectionRuleName string
@@ -122,9 +122,9 @@ resource vNIC 'Microsoft.Network/networkInterfaces@2023-09-01' = {
 }
 
 // get existing vm ss
-resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
-  name: VmssName
-}
+// resource vmssFlex 'Microsoft.Compute/virtualMachineScaleSets@2024-03-01'existing = {
+//   name: VmssName
+// }
 
 resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: VMName
@@ -168,9 +168,9 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       ]
     }
     licenseType: 'Windows_Client'
-    virtualMachineScaleSet:{
-      id: vmssFlex.id
-    }
+    // virtualMachineScaleSet:{
+    //   id: vmssFlex.id
+    // }
   }
   // Guest Attestation (Integrity Monitoring) //
   resource deployIntegrityMonitoring 'extensions@2023-09-01' = {

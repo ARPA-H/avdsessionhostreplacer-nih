@@ -72,7 +72,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     BaseScriptUri: BaseScriptUri
     FslogixStorageName: FslogixStorageName
     FslogixFileShareName: FslogixFileShareName
-    VmssName: VmssName
+    //VmssName: VmssName
     DataCollectionRuleName:DataCollectionRuleName
     // HostPoolResourceGroup: HostPoolResourceGroup
     // FunctionAppName: FunctionAppName

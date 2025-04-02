@@ -173,8 +173,8 @@ param FslogixFileShareName string
 @sys.description('Required, the file for configuring the session host')
 param BaseScriptUri string
 
-@sys.description('Required, the name of the virtual machine scale set')
-param VmssName string
+// @sys.description('Required, the name of the virtual machine scale set')
+// param VmssName string
 
 @sys.description('Required, the name of the data collection rule')
 param DataCollectionRuleName string = 'dcr-avd-${toLower(DeploymentEnvironment)}-use2'
@@ -316,7 +316,7 @@ var varSessionHostTemplateParameters = {
   BaseScriptUri: BaseScriptUri
   FslogixStorageName: FslogixStorageName
   FslogixFileShareName: FslogixFileShareName
-  VmssName: VmssName
+  //VmssName: VmssName
   DataCollectionRuleName: existingDataCollectionRule.id
   // HostPoolResourceGroup: HostPoolResourceGroupName
   // FunctionAppName: varFunctionAppName
