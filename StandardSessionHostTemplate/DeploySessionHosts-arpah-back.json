@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.34.44.8038",
-      "templateHash": "2745201876400970652"
+      "version": "0.33.93.31351",
+      "templateHash": "3576638655273476029"
     }
   },
   "parameters": {
@@ -164,6 +164,9 @@
           "FslogixFileShareName": {
             "value": "[parameters('FslogixFileShareName')]"
           },
+          "VmssName": {
+            "value": "[parameters('VmssName')]"
+          },
           "DataCollectionRuleName": {
             "value": "[parameters('DataCollectionRuleName')]"
           },
@@ -177,8 +180,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.34.44.8038",
-              "templateHash": "3298505530635675986"
+              "version": "0.33.93.31351",
+              "templateHash": "5423582213513204382"
             }
           },
           "parameters": {
@@ -262,6 +265,12 @@
               "type": "string",
               "metadata": {
                 "description": "Required, the file for configuring the session host"
+              }
+            },
+            "VmssName": {
+              "type": "string",
+              "metadata": {
+                "description": "Required, the name of the virtual machine scale set"
               }
             },
             "DataCollectionRuleName": {
@@ -351,8 +360,8 @@
                 "autoUpgradeMinorVersion": true
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployIntegrityMonitoring')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployIntegrityMonitoring')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             },
             {
@@ -379,8 +388,8 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             },
             {
@@ -397,8 +406,8 @@
                 "settings": "[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), null()), null())]"
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             },
             {
@@ -424,8 +433,8 @@
                 }
               },
               "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             },
             {
@@ -522,7 +531,10 @@
                     }
                   ]
                 },
-                "licenseType": "Windows_Client"
+                "licenseType": "Windows_Client",
+                "virtualMachineScaleSet": {
+                  "id": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
+                }
               },
               "tags": "[parameters('Tags')]",
               "dependsOn": [
@@ -573,8 +585,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.34.44.8038",
-                      "templateHash": "5134409313697181849"
+                      "version": "0.33.93.31351",
+                      "templateHash": "6919490302839277834"
                     }
                   },
                   "parameters": {
