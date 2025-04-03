@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.34.44.8038",
-      "templateHash": "9204281385945680359"
+      "templateHash": "8753705976144749911"
     }
   },
   "parameters": {
@@ -172,7 +172,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.34.44.8038",
-              "templateHash": "15990702320622867784"
+              "templateHash": "14409893833649130689"
             }
           },
           "parameters": {
@@ -269,11 +269,12 @@
             "varRequireNvidiaGPU": "[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
             "varVMNumber": "[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
             "varAvailabilityZone": "[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]",
-            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration.ps1', parameters('BaseScriptUri'))]",
-            "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration.ps1",
+            "varSessionHostConfigurationScriptUri": "[format('{0}scripts/Set-SessionHostConfiguration-arpah.ps1', parameters('BaseScriptUri'))]",
+            "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration-arpah.ps1",
             "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
+            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
             "fslogix": true,
-            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -HostPoolRegistrationToken {5} -NvidiaVmSize {6} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
+            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
             "varAmdVmSizes": [
               "Standard_NV4as_v4",
               "Standard_NV8as_v4",
