@@ -14,7 +14,6 @@ param (
     [string]$BaseScriptUri,
     [string]$FslogixStorageName,
     [string]$FslogixFileShareName,
-    #[string]$VmssName,
     [string]$VMPostFix,
     [string]$DeploymentEnvironment,
     [int]$TargetSessionHostCount,
@@ -36,7 +35,6 @@ $TemplateParameters = @{
     BaseScriptUri = $BaseScriptUri
     FslogixStorageName = $FslogixStorageName
     FslogixFileShareName = $FslogixFileShareName
-    #VmssName = $VmssName
     
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName
@@ -57,11 +55,9 @@ $TemplateParameters = @{
     ## Session Host Template Parameters ##
     SessionHostsRegion                           = 'eastus2' # Does not have to be the same as Host Pool
     AvailabilityZones                            = @("1", "3") # Set to empty array if not using AZs
-    #AvailabilityZones                            = @("1") # Set to empty array if not using AZs
     SessionHostSize                              = 'Standard_D4ads_v5' # Make sure its available in the region / AZs
     AcceleratedNetworking                        = $false # Make sure the size supports it
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
-
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
     MarketPlaceImage                             = 'win11-24h2-avd-m365'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
@@ -118,6 +114,3 @@ $paramNewAzResourceGroupDeployment = @{
 }
 
 New-AzResourceGroupDeployment @paramNewAzResourceGroupDeployment
-
-#Write-Output $paramNewAzResourceGroupDeployment
-#Write-Output $TemplateParameters
