@@ -19,7 +19,8 @@ param (
     [int]$TargetSessionHostCount,
     [string]$Branch,
     [string]$GalleryImageId,
-    [string]$MonitoringResourceGroupName
+    [string]$MonitoringResourceGroupName,
+    [string]$ConfigurationScript
 
 )
 

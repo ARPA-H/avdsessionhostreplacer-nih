@@ -45,6 +45,9 @@ param BaseScriptUri string
 @sys.description('Required, the name of the data collection rule')
 param DataCollectionRuleName string
 
+@sys.description('Required, the file for configuring the session host')
+param ConfigurationScript string
+
 // @sys.description('Required, Host Pool Resource Group')
 // param HostPoolResourceGroup string
 
@@ -76,6 +79,7 @@ module deploySessionHosts 'modules/AVDStandardSessionHost-arpah.bicep' = [for vm
     DataCollectionRuleName:DataCollectionRuleName
     // HostPoolResourceGroup: HostPoolResourceGroup
     // FunctionAppName: FunctionAppName
+    ConfigurationScript: ConfigurationScript
     Tags: Tags
   }
 }]

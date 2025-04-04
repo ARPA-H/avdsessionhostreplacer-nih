@@ -49,6 +49,9 @@ param BaseScriptUri string
 @sys.description('Required, the name of the data collection rule')
 param DataCollectionRuleName string
 
+@sys.description('Required, the file for configuring the session host')
+param ConfigurationScript string
+
 // @sys.description('Required, Host Pool Resource Group')
 // param HostPoolResourceGroup string
 
@@ -68,10 +71,14 @@ var varVMNumber = int(
 
 var varAvailabilityZone = AvailabilityZones == [] ? [] : [ '${AvailabilityZones[varVMNumber % length(AvailabilityZones)]}' ]
 
-var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
-var varSessionHostConfigurationScript = './Set-SessionHostConfiguration.ps1'
+// var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/Set-SessionHostConfiguration.ps1'
+// var varSessionHostConfigurationScript = './Set-SessionHostConfiguration.ps1'
+
+var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/${ConfigurationScript}'
+var varSessionHostConfigurationScript = './${ConfigurationScript}'
+
 var varFslogixSharePath = '\\\\${FslogixStorageName}.file.${environment().suffixes.storage}\\${FslogixFileShareName}' 
-var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
+//var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
 var fslogix = true
 
 

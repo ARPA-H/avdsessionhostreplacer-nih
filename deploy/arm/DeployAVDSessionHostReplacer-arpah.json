@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.34.44.8038",
-      "templateHash": "2185819178089805495"
+      "templateHash": "18233393608893492910"
     }
   },
   "parameters": {
@@ -343,7 +343,7 @@
     "BaseScriptUri": {
       "type": "string",
       "metadata": {
-        "description": "Required, the file for configuring the session host"
+        "description": "Required, the base uri for configuring the session host"
       }
     },
     "DataCollectionRuleName": {
@@ -357,6 +357,12 @@
       "type": "string",
       "metadata": {
         "description": "Required, the name of the monitoring resource group"
+      }
+    },
+    "ConfigurationScript": {
+      "type": "string",
+      "metadata": {
+        "description": "Required, the file for configuring the session host"
       }
     }
   },
@@ -453,6 +459,7 @@
       "FslogixStorageName": "[parameters('FslogixStorageName')]",
       "FslogixFileShareName": "[parameters('FslogixFileShareName')]",
       "DataCollectionRuleName": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', subscription().subscriptionId), format('{0}', parameters('MonitoringResourceGroupName'))), 'Microsoft.Insights/dataCollectionRules', parameters('DataCollectionRuleName'))]",
+      "ConfigurationScript": "[parameters('ConfigurationScript')]",
       "tags": {}
     },
     "varAzureEnvironments": [
@@ -893,7 +900,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.34.44.8038",
-              "templateHash": "2318971944839221632"
+              "templateHash": "3318892302941612651"
             }
           },
           "parameters": {
@@ -913,7 +920,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.34.44.8038",
-                  "templateHash": "3031694762518446023"
+                  "templateHash": "430194073321509191"
                 }
               },
               "parameters": {
@@ -995,6 +1002,12 @@
                   "metadata": {
                     "description": "Required, the name of the data collection rule"
                   }
+                },
+                "ConfigurationScript": {
+                  "type": "string",
+                  "metadata": {
+                    "description": "Required, the file for configuring the session host"
+                  }
                 }
               },
               "resources": [
@@ -1069,6 +1082,9 @@
                       "DataCollectionRuleName": {
                         "value": "[[parameters('DataCollectionRuleName')]"
                       },
+                      "ConfigurationScript": {
+                        "value": "[[parameters('ConfigurationScript')]"
+                      },
                       "Tags": {
                         "value": "[[parameters('Tags')]"
                       }
@@ -1080,7 +1096,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.34.44.8038",
-                          "templateHash": "10929608459716573799"
+                          "templateHash": "12681967352654995629"
                         }
                       },
                       "parameters": {
@@ -1171,16 +1187,21 @@
                           "metadata": {
                             "description": "Required, the name of the data collection rule"
                           }
+                        },
+                        "ConfigurationScript": {
+                          "type": "string",
+                          "metadata": {
+                            "description": "Required, the file for configuring the session host"
+                          }
                         }
                       },
                       "variables": {
                         "varRequireNvidiaGPU": "[[or(startsWith(parameters('VMSize'), 'Standard_NC'), contains(parameters('VMSize'), '_A10_v5'))]",
                         "varVMNumber": "[[int(substring(parameters('VMName'), add(lastIndexOf(parameters('VMName'), '-'), 1), sub(sub(length(parameters('VMName')), lastIndexOf(parameters('VMName'), '-')), 1)))]",
                         "varAvailabilityZone": "[[if(equals(parameters('AvailabilityZones'), createArray()), createArray(), createArray(format('{0}', parameters('AvailabilityZones')[mod(variables('varVMNumber'), length(parameters('AvailabilityZones')))])))]",
-                        "varSessionHostConfigurationScriptUri": "[[format('{0}scripts/Set-SessionHostConfiguration.ps1', parameters('BaseScriptUri'))]",
-                        "varSessionHostConfigurationScript": "./Set-SessionHostConfiguration.ps1",
+                        "varSessionHostConfigurationScriptUri": "[[format('{0}scripts/{1}', parameters('BaseScriptUri'), parameters('ConfigurationScript'))]",
+                        "varSessionHostConfigurationScript": "[[format('./{0}', parameters('ConfigurationScript'))]",
                         "varFslogixSharePath": "[[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
-                        "varFslogixStorageFqdn": "[[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
                         "fslogix": true,
                         "varScriptArguments": "[[format('-ExtendOsDisk false -IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -HostPoolRegistrationToken {5} -NvidiaVmSize {6} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
                         "varAmdVmSizes": [

@@ -4,8 +4,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.33.93.31351",
-      "templateHash": "31615883419847765"
+      "version": "0.34.44.8038",
+      "templateHash": "2185819178089805495"
     }
   },
   "parameters": {
@@ -346,12 +346,6 @@
         "description": "Required, the file for configuring the session host"
       }
     },
-    "VmssName": {
-      "type": "string",
-      "metadata": {
-        "description": "Required, the name of the virtual machine scale set"
-      }
-    },
     "DataCollectionRuleName": {
       "type": "string",
       "defaultValue": "[format('dcr-avd-{0}-use2', toLower(parameters('DeploymentEnvironment')))]",
@@ -458,7 +452,6 @@
       "BaseScriptUri": "[parameters('BaseScriptUri')]",
       "FslogixStorageName": "[parameters('FslogixStorageName')]",
       "FslogixFileShareName": "[parameters('FslogixFileShareName')]",
-      "VmssName": "[parameters('VmssName')]",
       "DataCollectionRuleName": "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', format('{0}', subscription().subscriptionId), format('{0}', parameters('MonitoringResourceGroupName'))), 'Microsoft.Insights/dataCollectionRules', parameters('DataCollectionRuleName'))]",
       "tags": {}
     },
@@ -628,8 +621,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.33.93.31351",
-              "templateHash": "13409817767727311647"
+              "version": "0.34.44.8038",
+              "templateHash": "6746843369638955602"
             }
           },
           "parameters": {
@@ -831,8 +824,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.33.93.31351",
-                      "templateHash": "3087335480340646655"
+                      "version": "0.34.44.8038",
+                      "templateHash": "12274718558334175208"
                     }
                   },
                   "parameters": {
@@ -899,8 +892,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.33.93.31351",
-              "templateHash": "7322065983166486815"
+              "version": "0.34.44.8038",
+              "templateHash": "2318971944839221632"
             }
           },
           "parameters": {
@@ -919,8 +912,8 @@
               "metadata": {
                 "_generator": {
                   "name": "bicep",
-                  "version": "0.33.93.31351",
-                  "templateHash": "3576638655273476029"
+                  "version": "0.34.44.8038",
+                  "templateHash": "3031694762518446023"
                 }
               },
               "parameters": {
@@ -995,12 +988,6 @@
                   "type": "string",
                   "metadata": {
                     "description": "Required, the file for configuring the session host"
-                  }
-                },
-                "VmssName": {
-                  "type": "string",
-                  "metadata": {
-                    "description": "Required, the name of the virtual machine scale set"
                   }
                 },
                 "DataCollectionRuleName": {
@@ -1079,9 +1066,6 @@
                       "FslogixFileShareName": {
                         "value": "[[parameters('FslogixFileShareName')]"
                       },
-                      "VmssName": {
-                        "value": "[[parameters('VmssName')]"
-                      },
                       "DataCollectionRuleName": {
                         "value": "[[parameters('DataCollectionRuleName')]"
                       },
@@ -1095,8 +1079,8 @@
                       "metadata": {
                         "_generator": {
                           "name": "bicep",
-                          "version": "0.33.93.31351",
-                          "templateHash": "5423582213513204382"
+                          "version": "0.34.44.8038",
+                          "templateHash": "10929608459716573799"
                         }
                       },
                       "parameters": {
@@ -1182,12 +1166,6 @@
                             "description": "Required, the file for configuring the session host"
                           }
                         },
-                        "VmssName": {
-                          "type": "string",
-                          "metadata": {
-                            "description": "Required, the name of the virtual machine scale set"
-                          }
-                        },
                         "DataCollectionRuleName": {
                           "type": "string",
                           "metadata": {
@@ -1204,7 +1182,7 @@
                         "varFslogixSharePath": "[[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
                         "varFslogixStorageFqdn": "[[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
                         "fslogix": true,
-                        "varScriptArguments": "[[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
+                        "varScriptArguments": "[[format('-ExtendOsDisk false -IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -HostPoolRegistrationToken {5} -NvidiaVmSize {6} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
                         "varAmdVmSizes": [
                           "Standard_NV4as_v4",
                           "Standard_NV8as_v4",
@@ -1275,8 +1253,8 @@
                             "autoUpgradeMinorVersion": true
                           },
                           "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployIntegrityMonitoring')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployIntegrityMonitoring')]"
                           ]
                         },
                         {
@@ -1303,8 +1281,8 @@
                             }
                           },
                           "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'deployGPUDriversNvidia')]"
                           ]
                         },
                         {
@@ -1321,8 +1299,8 @@
                             "settings": "[[if(contains(parameters('DomainJoinObject'), 'IntuneJoin'), if(parameters('DomainJoinObject').IntuneJoin, createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), null()), null())]"
                           },
                           "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]"
                           ]
                         },
                         {
@@ -1348,8 +1326,8 @@
                             }
                           },
                           "dependsOn": [
-                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]",
-                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
+                            "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]"
                           ]
                         },
                         {
@@ -1446,10 +1424,7 @@
                                 }
                               ]
                             },
-                            "licenseType": "Windows_Client",
-                            "virtualMachineScaleSet": {
-                              "id": "[[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('VmssName'))]"
-                            }
+                            "licenseType": "Windows_Client"
                           },
                           "tags": "[[parameters('Tags')]",
                           "dependsOn": [
@@ -1500,8 +1475,8 @@
                               "metadata": {
                                 "_generator": {
                                   "name": "bicep",
-                                  "version": "0.33.93.31351",
-                                  "templateHash": "6919490302839277834"
+                                  "version": "0.34.44.8038",
+                                  "templateHash": "5134409313697181849"
                                 }
                               },
                               "parameters": {
@@ -1605,8 +1580,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.33.93.31351",
-              "templateHash": "3087335480340646655"
+              "version": "0.34.44.8038",
+              "templateHash": "12274718558334175208"
             }
           },
           "parameters": {
@@ -1666,8 +1641,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.33.93.31351",
-              "templateHash": "3087335480340646655"
+              "version": "0.34.44.8038",
+              "templateHash": "12274718558334175208"
             }
           },
           "parameters": {

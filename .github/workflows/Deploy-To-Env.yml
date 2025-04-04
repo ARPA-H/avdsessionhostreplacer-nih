@@ -62,7 +62,8 @@ jobs:
              -TargetSessionHostCount ${{ github.event.inputs.sessionHostToDeploy }} `
              -Branch ${{ env.BRANCH_NAME }} `
              -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}' 
-             -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}'
+             -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}' `
+             -ConfigurationScript 'Set-SessionHostConfiguration.ps1'
 
             azPSVersion: "latest"
             errorActionPreference: stop
@@ -91,7 +92,8 @@ jobs:
               -TargetSessionHostCount ${{ github.event.inputs.remoteAppToDeploy }} `
               -Branch ${{ env.BRANCH_NAME }} `
               -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}' 
-              -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}'
+              -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}' `
+              -ConfigurationScript 'Set-SessionHostConfiguration.ps1'
             azPSVersion: "latest"
             errorActionPreference: continue
             
