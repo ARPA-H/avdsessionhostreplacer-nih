@@ -34,6 +34,7 @@ $TemplateParameters = @{
     KeyVaultName = $KeyVaultName
     AppPoolType = $AppPoolType # 'SessionDesktop' or 'RemoteApp'
     BaseScriptUri = $BaseScriptUri
+    ConfigurationScript = $ConfigurationScript # This is the script that will be run on the session hosts. It should be in the BaseScriptUri location. The script should be a .ps1 file.
     FslogixStorageName = $FslogixStorageName
     FslogixFileShareName = $FslogixFileShareName
     
