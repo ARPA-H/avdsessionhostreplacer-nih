@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.34.44.8038",
-      "templateHash": "8362683274457547343"
+      "templateHash": "18233393608893492910"
     }
   },
   "parameters": {
@@ -900,7 +900,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.34.44.8038",
-              "templateHash": "4645350793991342928"
+              "templateHash": "3318892302941612651"
             }
           },
           "parameters": {
@@ -920,7 +920,7 @@
                 "_generator": {
                   "name": "bicep",
                   "version": "0.34.44.8038",
-                  "templateHash": "2696281731931529379"
+                  "templateHash": "430194073321509191"
                 }
               },
               "parameters": {
@@ -1096,7 +1096,7 @@
                         "_generator": {
                           "name": "bicep",
                           "version": "0.34.44.8038",
-                          "templateHash": "9503920646045719765"
+                          "templateHash": "12681967352654995629"
                         }
                       },
                       "parameters": {
@@ -1349,6 +1349,37 @@
                           "dependsOn": [
                             "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
                             "[[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]"
+                          ]
+                        },
+                        {
+                          "type": "Microsoft.Compute/virtualMachines/extensions",
+                          "apiVersion": "2023-09-01",
+                          "name": "[[format('{0}/{1}', parameters('VMName'), 'MicrosoftAntiMalware')]",
+                          "location": "[[parameters('Location')]",
+                          "properties": {
+                            "publisher": "Microsoft.Azure.Security",
+                            "type": "IaaSAntimalware",
+                            "typeHandlerVersion": "1.3",
+                            "autoUpgradeMinorVersion": true,
+                            "enableAutomaticUpgrade": false,
+                            "settings": {
+                              "AntimalwareEnabled": true,
+                              "RealtimeProtectionEnabled": "true",
+                              "ScheduledScanSettings": {
+                                "isEnabled": "true",
+                                "day": "7",
+                                "time": "120",
+                                "scanType": "Quick"
+                              },
+                              "Exclusions": {
+                                "Extensions": "*.vhd;*.vhdx",
+                                "Paths": "[[format('\"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;{0}\\*\\*.VHD;{1}\\*\\*.VHDX', variables('varFslogixSharePath'), variables('varFslogixSharePath'))]",
+                                "Processes": "%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe"
+                              }
+                            }
+                          },
+                          "dependsOn": [
+                            "[[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                           ]
                         },
                         {

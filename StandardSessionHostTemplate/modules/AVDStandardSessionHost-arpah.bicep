@@ -325,35 +325,35 @@ resource VM 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     ]
   }
 
-  resource AntiMalwareExtension 'extensions@2023-09-01' = {
-    name: 'MicrosoftAntiMalware'
-    //parent: virtualMachine
-    location: Location
-    properties: {
-      publisher: 'Microsoft.Azure.Security'
-      type: 'IaaSAntimalware'
-      typeHandlerVersion: '1.3'
-      autoUpgradeMinorVersion: true
-      enableAutomaticUpgrade: false
-      settings: {
-          AntimalwareEnabled: true
-          RealtimeProtectionEnabled: 'true'
-          ScheduledScanSettings: {
-              isEnabled: 'true'
-              day: '7' // Day of the week for scheduled scan (1-Sunday, 2-Monday, ..., 7-Saturday)
-              time: '120' // When to perform the scheduled scan, measured in minutes from midnight (0-1440). For example: 0 = 12AM, 60 = 1AM, 120 = 2AM.
-              scanType: 'Quick' //Indicates whether scheduled scan setting type is set to Quick or Full (default is Quick)
-          }
-          Exclusions: {
-              Extensions: '*.vhd;*.vhdx'
-              Paths: '"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;${varFslogixSharePath}\\*\\*.VHD;${varFslogixSharePath}\\*\\*.VHDX'
-              Processes: '%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe'
-          }
-      }
-      // protectedSettings: !empty(protectedSettings) ? protectedSettings : null
-      // suppressFailures: supressFailures
-    }
-  }
+  // resource AntiMalwareExtension 'extensions@2023-09-01' = {
+  //   name: 'MicrosoftAntiMalware'
+  //   //parent: virtualMachine
+  //   location: Location
+  //   properties: {
+  //     publisher: 'Microsoft.Azure.Security'
+  //     type: 'IaaSAntimalware'
+  //     typeHandlerVersion: '1.3'
+  //     autoUpgradeMinorVersion: true
+  //     enableAutomaticUpgrade: false
+  //     settings: {
+  //         AntimalwareEnabled: true
+  //         RealtimeProtectionEnabled: 'true'
+  //         ScheduledScanSettings: {
+  //             isEnabled: 'true'
+  //             day: '7' // Day of the week for scheduled scan (1-Sunday, 2-Monday, ..., 7-Saturday)
+  //             time: '120' // When to perform the scheduled scan, measured in minutes from midnight (0-1440). For example: 0 = 12AM, 60 = 1AM, 120 = 2AM.
+  //             scanType: 'Quick' //Indicates whether scheduled scan setting type is set to Quick or Full (default is Quick)
+  //         }
+  //         Exclusions: {
+  //             Extensions: '*.vhd;*.vhdx'
+  //             Paths: '"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;${varFslogixSharePath}\\*\\*.VHD;${varFslogixSharePath}\\*\\*.VHDX'
+  //             Processes: '%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe'
+  //         }
+  //     }
+  //     // protectedSettings: !empty(protectedSettings) ? protectedSettings : null
+  //     // suppressFailures: supressFailures
+  //   }
+  // }
 
   tags: Tags
 }
