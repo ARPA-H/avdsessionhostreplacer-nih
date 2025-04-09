@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.34.44.8038",
-      "templateHash": "10725132491251138160"
+      "templateHash": "2903863565920375141"
     }
   },
   "parameters": {
@@ -181,7 +181,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.34.44.8038",
-              "templateHash": "12787680280025997733"
+              "templateHash": "17179130537816338957"
             }
           },
           "parameters": {
@@ -287,9 +287,9 @@
             "varSessionHostConfigurationScriptUri": "[format('{0}scripts/{1}', parameters('BaseScriptUri'), parameters('ConfigurationScript'))]",
             "varSessionHostConfigurationScript": "[format('./{0}', parameters('ConfigurationScript'))]",
             "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
+            "varFslogixStorageFqdn": "[format('{0}.file.{1}', parameters('FslogixStorageName'), environment().suffixes.storage)]",
             "fslogix": true,
-            "extendOsDisk": false,
-            "varScriptArguments": "[format('-ExtendOsDisk {0} -IdentityDomainName {1} -AmdVmSize {2} -IdentityServiceProvider {3} -Fslogix {4} -FslogixFileShare {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', variables('extendOsDisk'), parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
+            "varScriptArguments": "[format('-IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -FslogixStorageFqdn {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), variables('varFslogixStorageFqdn'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
             "varAmdVmSizes": [
               "Standard_NV4as_v4",
               "Standard_NV8as_v4",

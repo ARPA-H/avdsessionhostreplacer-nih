@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.34.44.8038",
-      "templateHash": "430194073321509191"
+      "templateHash": "10725132491251138160"
     }
   },
   "parameters": {
@@ -181,7 +181,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.34.44.8038",
-              "templateHash": "12681967352654995629"
+              "templateHash": "12787680280025997733"
             }
           },
           "parameters": {
@@ -288,7 +288,8 @@
             "varSessionHostConfigurationScript": "[format('./{0}', parameters('ConfigurationScript'))]",
             "varFslogixSharePath": "[format('\\\\{0}.file.{1}\\{2}', parameters('FslogixStorageName'), environment().suffixes.storage, parameters('FslogixFileShareName'))]",
             "fslogix": true,
-            "varScriptArguments": "[format('-ExtendOsDisk false -IdentityDomainName {0} -AmdVmSize {1} -IdentityServiceProvider {2} -Fslogix {3} -FslogixFileShare {4} -HostPoolRegistrationToken {5} -NvidiaVmSize {6} -verbose', parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
+            "extendOsDisk": false,
+            "varScriptArguments": "[format('-ExtendOsDisk {0} -IdentityDomainName {1} -AmdVmSize {2} -IdentityServiceProvider {3} -Fslogix {4} -FslogixFileShare {5} -HostPoolRegistrationToken {6} -NvidiaVmSize {7} -verbose', variables('extendOsDisk'), parameters('DomainJoinObject').DomainName, variables('varAmdVmSize'), parameters('AVDIdentityServiceProvider'), variables('fslogix'), variables('varFslogixSharePath'), parameters('HostPoolToken'), variables('varNvidiaVmSize'))]",
             "varAmdVmSizes": [
               "Standard_NV4as_v4",
               "Standard_NV8as_v4",
@@ -434,37 +435,6 @@
               "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]",
                 "[resourceId('Microsoft.Compute/virtualMachines/extensions', parameters('VMName'), 'JoinHostPool')]"
-              ]
-            },
-            {
-              "type": "Microsoft.Compute/virtualMachines/extensions",
-              "apiVersion": "2023-09-01",
-              "name": "[format('{0}/{1}', parameters('VMName'), 'MicrosoftAntiMalware')]",
-              "location": "[parameters('Location')]",
-              "properties": {
-                "publisher": "Microsoft.Azure.Security",
-                "type": "IaaSAntimalware",
-                "typeHandlerVersion": "1.3",
-                "autoUpgradeMinorVersion": true,
-                "enableAutomaticUpgrade": false,
-                "settings": {
-                  "AntimalwareEnabled": true,
-                  "RealtimeProtectionEnabled": "true",
-                  "ScheduledScanSettings": {
-                    "isEnabled": "true",
-                    "day": "7",
-                    "time": "120",
-                    "scanType": "Quick"
-                  },
-                  "Exclusions": {
-                    "Extensions": "*.vhd;*.vhdx",
-                    "Paths": "[format('\"%ProgramFiles%\\FSLogix\\Apps\\frxdrv.sys;%ProgramFiles%\\FSLogix\\Apps\\frxccd.sys;%ProgramFiles%\\FSLogix\\Apps\\frxdrvvt.sys;%TEMP%\\*.VHD;%TEMP%\\*.VHDX;%Windir%\\TEMP\\*.VHD;%Windir%\\TEMP\\*.VHDX;{0}\\*\\*.VHD;{1}\\*\\*.VHDX', variables('varFslogixSharePath'), variables('varFslogixSharePath'))]",
-                    "Processes": "%ProgramFiles%\\FSLogix\\Apps\\frxccd.exe;%ProgramFiles%\\FSLogix\\Apps\\frxccds.exe;%ProgramFiles%\\FSLogix\\Apps\\frxsvc.exe"
-                  }
-                }
-              },
-              "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
               ]
             },
             {

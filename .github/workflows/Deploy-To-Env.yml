@@ -63,7 +63,7 @@ jobs:
              -Branch ${{ env.BRANCH_NAME }} `
              -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}' 
              -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}' `
-             -ConfigurationScript 'Set-SessionHostConfiguration.ps1'
+             -ConfigurationScript 'Set-SessionHostConfiguration-arpah.ps1'
 
             azPSVersion: "latest"
             errorActionPreference: stop
@@ -93,7 +93,7 @@ jobs:
               -Branch ${{ env.BRANCH_NAME }} `
               -GalleryImageId '${{ secrets.GALLERY_IMAGE_ID }}' 
               -MonitoringResourceGroupName '${{ secrets.AVD_MONITORING_RG }}' `
-              -ConfigurationScript 'Set-SessionHostConfiguration.ps1'
+              -ConfigurationScript 'Set-SessionHostConfiguration-arpah.ps1'
             azPSVersion: "latest"
             errorActionPreference: continue
             

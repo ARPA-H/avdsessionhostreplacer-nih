@@ -78,10 +78,10 @@ var varSessionHostConfigurationScriptUri = '${BaseScriptUri}scripts/${Configurat
 var varSessionHostConfigurationScript = './${ConfigurationScript}'
 
 var varFslogixSharePath = '\\\\${FslogixStorageName}.file.${environment().suffixes.storage}\\${FslogixFileShareName}' 
-//var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
+var varFslogixStorageFqdn = '${FslogixStorageName}.file.${environment().suffixes.storage}'
 var fslogix = true
 
-var extendOsDisk = false
+//var extendOsDisk = false
 
 
 // Param(
@@ -119,9 +119,9 @@ var extendOsDisk = false
 
 
 // old script Set-SessionHostConfiguration-arpah.ps1
-//var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+var varScriptArguments = '-IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -FslogixStorageFqdn ${varFslogixStorageFqdn} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
 // new script Set-SessionHostConfiguration.ps1
-var varScriptArguments = '-ExtendOsDisk ${extendOsDisk} -IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
+//var varScriptArguments = '-ExtendOsDisk ${extendOsDisk} -IdentityDomainName ${DomainJoinObject.DomainName} -AmdVmSize ${varAmdVmSize} -IdentityServiceProvider ${AVDIdentityServiceProvider} -Fslogix ${fslogix} -FslogixFileShare ${varFslogixSharePath} -HostPoolRegistrationToken ${HostPoolToken} -NvidiaVmSize ${varNvidiaVmSize} -verbose'
 //var varBaseScriptArguments = '-IdentityServiceProvider ${identityServiceProvider} -Fslogix ${fslogix} -HostPoolRegistrationToken "${hostPool.listRegistrationTokens().value[0].token}" -AmdVmSize ${varAmdVmSize} -NvidiaVmSize ${varNvidiaVmSize}'
 
 var varAmdVmSizes = [
