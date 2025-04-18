@@ -31,18 +31,16 @@ $TemplateParameters = @{
     UseExistingLAW                               = $true
     LogAnalyticsWorkspaceId = $LogAnalyticsWorkspaceId # Only required if UseExistingLAW is $true. Use ResourceID
 
-    KeyVaultName = $KeyVaultName
-    AppPoolType = $AppPoolType # 'SessionDesktop' or 'RemoteApp'
-    BaseScriptUri = $BaseScriptUri
-    ConfigurationScript = $ConfigurationScript # This is the script that will be run on the session hosts. It should be in the BaseScriptUri location. The script should be a .ps1 file.
-    FslogixStorageName = $FslogixStorageName
-    FslogixFileShareName = $FslogixFileShareName
+    KeyVaultName                                 = $KeyVaultName
+    AppPoolType                                  = $AppPoolType # 'SessionDesktop' or 'RemoteApp'
+    BaseScriptUri                                = $BaseScriptUri
+    ConfigurationScript                          = $ConfigurationScript # This is the script that will be run on the session hosts. It should be in the BaseScriptUri location. The script should be a .ps1 file.
+    FslogixStorageName                           = $FslogixStorageName
+    FslogixFileShareName                         = $FslogixFileShareName
     
     ## Required Parameters ##
     HostPoolName                                 = $HostPoolName
     HostPoolResourceGroupName                    = $ResourceGroupName
-    #SessionHostNamePrefix                        = 'avdshr' # Will be appended by '-XX'
-    #SessionHostNamePrefix                        = "arpahavd$VMPostFix" # Will be appended by '-XX'
     SessionHostNamePrefix                        = $VMPostFix # Will be appended by '-XX'
     TargetSessionHostCount                       = $TargetSessionHostCount # How many session hosts to maintain in the Host Pool
     TargetSessionHostBuffer                      = 2 # The maximum number of session hosts to add during a replacement process
@@ -101,8 +99,6 @@ $TemplateParameters = @{
 $paramNewAzResourceGroupDeployment = @{
     Name = $TemplateName
     ResourceGroupName = $ResourceGroupName
-    #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.0.1-beta.0/deploy/arm/DeployAVDSessionHostReplacer.json'
-    #TemplateUri = 'https://github.com/ARPA-H/avdsessionhostreplacer-nih/blob/main/deploy/arm/DeployAVDSessionHostReplacer.json'
     
     # this one works
     #TemplateUri = 'https://raw.githubusercontent.com/Azure/AVDSessionHostReplacer/v0.3.1-beta.1/deploy/arm/DeployAVDSessionHostReplacer.json'
