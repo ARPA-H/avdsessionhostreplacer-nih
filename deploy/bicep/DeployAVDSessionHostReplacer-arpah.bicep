@@ -48,6 +48,7 @@ param MarketPlaceOrCustomImage string
   'win11-23h2-avd'
   'win11-23h2-avd-m365'
   'win11-24h2-avd-m365'
+  'win11-24h2-avd'
   'win11-22h2-avd'
   '2022-datacenter-g2'
   'win10-22h2-avd-g2'
