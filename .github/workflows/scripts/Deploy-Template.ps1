@@ -59,7 +59,8 @@ $TemplateParameters = @{
     AcceleratedNetworking                        = $false # Make sure the size supports it
     SessionHostDiskType                          = 'Premium_LRS' #  STandard_LRS, StandardSSD_LRS, or Premium_LRS
     MarketPlaceOrCustomImage                     = 'Gallery' # MarketPlace or Gallery
-    MarketPlaceImage                             = 'win11-24h2-avd-m365'
+    # MarketPlaceImage                             = 'win11-24h2-avd-m365'
+    MarketPlaceImage                             = 'win11-24h2-avd'
     # If the Compute Gallery is in a different subscription assign the function app "Desktop Virtualization Virtual Machine Contributor" after deployment
     GalleryImageId                               = $GalleryImageId # Only required for 'CustomImage'. Use ResourceId of an Image Definition.
 
