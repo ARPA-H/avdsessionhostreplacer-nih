@@ -38,7 +38,7 @@ jobs:
 
       - name: Generate New Version and Tag (Dry_Run)
         id: bump_version_DryRun
-        uses: anothrNick/github-tag-action@1.67.0
+        uses: anothrNick/github-tag-action@a2c70ae13a881faf2b4953baaa9e49731997ab36 # 1.67.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
@@ -62,7 +62,7 @@ jobs:
 
       - name: Bump version and push tag
         id: bump_version
-        uses: anothrNick/github-tag-action@1.67.0
+        uses: anothrNick/github-tag-action@a2c70ae13a881faf2b4953baaa9e49731997ab36 # 1.67.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch  # Default to patch if no keywords are found
@@ -79,7 +79,7 @@ jobs:
       - name: Create Release
         # You may pin to the exact commit or the version.
         # uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5
-        uses: ncipollo/release-action@v1.14.0
+        uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
         with:
           # An optional flag which indicates if we should update a release if it already exists. Defaults to false.
           allowUpdates: true # optional, default is

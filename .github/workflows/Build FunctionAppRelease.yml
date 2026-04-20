@@ -14,6 +14,8 @@ on:
 jobs:
   Build-Nightly-Zip:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     if: github.sha == github.event.head_commit.id # Only run the job if the commit is the latest one
     steps:
       - name: Checkout code

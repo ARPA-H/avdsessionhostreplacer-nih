@@ -19,16 +19,18 @@ jobs:
     name: Deploy to ${{ github.event.inputs.environment }} environment
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
       SESSION_DESKTOP_POSTFIX: ${{ github.event.inputs.environment == 'Prod' && 'avddevp' || 'avddevt' }}
       
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
         
       - name: Log into Azure
-        uses: azure/login@v1
+        uses: azure/login@cb79c773a3cfa27f31f25eb3f677781210c9ce3d # v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           enable-AzPSSession: true
