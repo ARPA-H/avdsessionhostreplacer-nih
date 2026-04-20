@@ -260,6 +260,12 @@ var varMarketPlaceImages = {
     offer: 'office-365'
     sku: 'win11-23h2-avd-m365'
   }
+  'win11-24h2-avd': {
+        publisher: 'MicrosoftWindowsDesktop'
+        offer: 'Windows-11'
+        sku: 'win11-24h2-avd'
+        version: 'latest'
+    }
 }
 var varImageReference = MarketPlaceOrCustomImage == 'Marketplace'
   ? {
