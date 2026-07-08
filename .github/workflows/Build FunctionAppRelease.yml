@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.2
         with:
-          ref: ${{ github.head_ref}}
+          ref: ${{ github.sha }}
       - name: Run-Build-Script
         shell: pwsh
         run: |

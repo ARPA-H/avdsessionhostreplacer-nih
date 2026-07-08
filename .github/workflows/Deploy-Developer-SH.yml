@@ -36,7 +36,7 @@ jobs:
           enable-AzPSSession: true
 
       - name: Run Azure PowerShell Script File to deploy session host replacer to the session desktop host pool in the ${{ github.event.inputs.environment }} environment
-        uses: azure/powershell@v2
+        uses: azure/powershell@53dd145408794f7e80f97cfcca04155c85234709 # v2
         with:
             inlineScript: ./.github/workflows/scripts/Deploy-Template.ps1 `
              -DomJoinUserName '${{ secrets.AD_JOIN_USER }}' `
